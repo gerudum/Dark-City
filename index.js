@@ -43,7 +43,7 @@ function Raffle(){
         weights.push(data[key].weight);
         data[key].weight = 0;
     }
-    winner = Roll(players,weights);
+    var winner = Roll(players,weights);
     const raffle = new Discord.RichEmbed()
     raffle.setTitle("Winner!")
     raffle.setThumbnail(manage.announcement)
@@ -81,6 +81,7 @@ bot.on('message', message=> {
     } 
     let player = message.author.id;
     if(!data[player]){
+        data[player] = {};
         data[player].name = message.author.username;
         data[player].weight = 0;
     }
@@ -88,7 +89,7 @@ bot.on('message', message=> {
     var admin;
     let args = message.content.substring(prefix.length).split(" ");
     if(message.channel.type === "text"){
-        admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
+        admin = message.guild.roles.find(role => role.name === "Pitboss").id;
     }  
     
     switch(args[0]){
@@ -110,6 +111,7 @@ bot.on('message', message=> {
                 }
             }   
             CreateAnnouncement(bot.channels.get(message.channel.id),announcement);
+        message.delete();
         break;   
         case 'raffle':
         if(!message.member.roles.has(admin)){
@@ -143,6 +145,7 @@ bot.on('message', message=> {
             } else {
                 message.author.send("Person doesn't exist, check your spelling.");
             }
+        message.delete();
         break;
         case 'draw':
         if(!message.member.roles.has(admin)){
@@ -150,9 +153,11 @@ bot.on('message', message=> {
             return;
         }
         Raffle();
+        message.delete();
         break;
         case 'rsrc':
             message.channel.send("https://imgur.com/a/WISJigc");
+        message.delete();
         break;
     }  
     
