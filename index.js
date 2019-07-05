@@ -241,6 +241,10 @@ bot.on('message', message=> {
         
         //Check who has data
         case 'player':
+            if(!message.member.roles.has(admin)){
+                message.author.send("You do not have the necessary roles.");
+                return;
+            }
             for(var key in data){
                 try{
                     message.author.send(data[key].name + " points: " + data[key].points);
@@ -248,6 +252,7 @@ bot.on('message', message=> {
                     console.log("Not a player");
                 }
             }
+            message.delete();
         break;
 
         //Add Points
@@ -296,6 +301,7 @@ bot.on('message', message=> {
         case 'points':
             var bank = CheckPoints(player);
             message.channel.send(bank);
+            message.delete();
         break;
 
         //Set a glyph deal
