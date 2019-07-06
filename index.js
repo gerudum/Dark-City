@@ -67,7 +67,7 @@ function AddGlyph(deal,price,gerudum){
     listing.setTitle("Glyph Shop Deal!")
     listing.addField("Deal",deal)
     listing.addField("Cost in Fiend Points",price)
-    listing.setThumbnail(manage.announcement)
+    listing.setThumbnail(manage.fiendpoints)
     
     shop.send(listing);/*then( mydeal => {
         data.listing[mydeal.id] = {};
