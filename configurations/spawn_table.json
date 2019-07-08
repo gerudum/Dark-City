@@ -1,7 +1,7 @@
 {
     "CASINO":{
         "TINY":{
-            "weight":250
+            "weight":225
         },
         "SMALL":{
             "weight":100
@@ -15,12 +15,15 @@
         "EXTRA LARGE":{
             "weight":10
         },
+        "WHAMMIE":{
+            "weight":10
+        },
         "JACKPOT":{
             "weight":5
         },
-        "WHAMMIE":{
-            "weight":25
-        }
+        "SPECIAL":{
+            "weight":0
+        } 
     },
     "POINTS":{
         "TINY":{
@@ -44,5 +47,8 @@
         "WHAMMIE":{
             "amount":-100
         }
+    },
+    "SPECIAL":{
+        
     }
 }

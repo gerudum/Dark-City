@@ -123,8 +123,9 @@ function Roll(loot, weights){
 function CheckPoints(player){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name);
-    embed.addField("Points",data[player].points);
-    embed.setThumbnail(data[player].art)
+    embed.addField("Points",data[player].points + "<:fiendpoints:597928183358160908>");
+    embed.addField("Fiend Coins", data[player].coins);
+    embed.setThumbnail(data[player].art);
     return embed;
 }
 
@@ -191,10 +192,14 @@ function Slots(player){
     if(conditions.GreaterThan(data[player].coins,1)){
         var drop = Spawn(spawn_table["CASINO"]);
         var points = spawn_table["POINTS"];
-
+        data[player].coins -= 1;
         //Add Points
-        AddPoints(player,points[drop].amount);
-        embed.addField("Result:","You have won " + points[drop].amount + " points! :fiendpoints:");
+        AddPoints(player,points[drop].amount)
+        //Whammie! Too bad for you!
+        if(conditions.LessThan(points[drop].amount,0)){
+            embed.addField("You hit the Whammie!","<:whammie:597933448220508161>")
+        }
+        embed.addField("Result:","You have won... " + points[drop].amount + " points! <:fiendpoints:597928183358160908>");
 
     } else {
         embed.addField("Result:","You do not have enough coins to spin! 1 coin per spin!")
@@ -242,7 +247,9 @@ bot.on('message', message=> {
     if(!data){
         data = {};
     }
-    
+    if(!data[player].art){
+        data[player].art = message.author.avatarURL;
+    }
     //Instancing Player Data
     if(!data[player]){
         InstancePlayer(player);
@@ -357,12 +364,12 @@ bot.on('message', message=> {
         //Set a glyph deal
         case 'glyph':
             if(!message.member.roles.has(admin)){
-                    message.author.send("You do not have the necessary roles.").
-                    return;
+                message.author.send("You do not have the necessary roles.").
+                return;
             }
             if (!args[1]) {
-                    message.author.send("Please specify something to List.");
-                    return;
+                message.author.send("Please specify something to List.");
+                return;
             }
             var listing = "";
             var index = 0;
@@ -514,31 +521,7 @@ bot.on('message', message=> {
             message.author.send("https://imgur.com/a/WISJigc");
         message.delete();
         break;
-        //Remove Weight
-        case 'unraffle':
-        if(!message.member.roles.has(admin)){
-            message.author.send("You do not have the necessary roles.").
-            return;
-        }
-        if(!args[1]){
-            message.author.send("Please specify someone to raffle.");
-            return;
-        }  
-          var person = FindPlayer(args);
-          var amount = parseInt(args[args.length - 1].toString());
-
-          for (var key in data){
-              if(data[key].name === person){
-                data[key].weight -= amount;
-                if(data[key].weight <= 0){
-                  data[key].weight = 0;
-                }
-                message.author.send("Entries Removed");
-              } 
-          }
-            
-        message.delete();
-        break;
+        
     }  
     
     //All Data we need to keep track of
