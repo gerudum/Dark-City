@@ -1,0 +1,48 @@
+{
+    "CASINO":{
+        "TINY":{
+            "weight":250
+        },
+        "SMALL":{
+            "weight":100
+        },
+        "MEDIUM":{
+            "weight":50
+        },
+        "LARGE":{
+            "weight":25
+        },
+        "EXTRA LARGE":{
+            "weight":10
+        },
+        "JACKPOT":{
+            "weight":5
+        },
+        "WHAMMIE":{
+            "weight":25
+        }
+    },
+    "POINTS":{
+        "TINY":{
+            "amount":10
+        },
+        "SMALL":{
+            "amount":30
+        },
+        "MEDIUM":{
+            "amount":50
+        },
+        "LARGE":{
+            "amount":200
+        },
+        "EXTRA LARGE":{
+            "amount":800
+        },
+        "JACKPOT":{
+            "amount":2000
+        },
+        "WHAMMIE":{
+            "amount":-100
+        }
+    }
+}
