@@ -17,7 +17,7 @@ setInterval(() => {
 }, 280000);
 
 
-let table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
+let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
 let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
 var conditions = require("./conditions.js");
@@ -317,7 +317,7 @@ bot.on('message', message=> {
                         } catch(e) {
                             console.log("Failed to give points, Syntax: /add [player] [points]");
                         }
-                        message.author.send(amount + " points Added to " + data[key].name);
+                        message.author.send(amount + " coins Added to " + data[key].name);
                     } 
                 }        
             message.delete();
