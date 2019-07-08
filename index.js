@@ -194,7 +194,7 @@ function Slots(player){
 
         //Add Points
         AddPoints(player,points[drop].amount);
-        embed.addField("Result:","You have won " + points + " points! :fiendpoints:");
+        embed.addField("Result:","You have won " + points[drop].amount + " points! :fiendpoints:");
 
     } else {
         embed.addField("Result:","You do not have enough coins to spin! 1 coin per spin!")
