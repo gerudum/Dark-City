@@ -123,8 +123,8 @@ function Roll(loot, weights){
 function CheckPoints(player){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name);
-    embed.addField("Points",data[player].points + "<:fiendpoints:597928183358160908>");
-    embed.addField("Fiend Coins", data[player].coins);
+    embed.addField("Fiend Points",data[player].points + "<:fiendpoints:598240296014184451>");
+    embed.addField("Fiend Tokens", data[player].coins + "<:fiendcoin:598240273662738433>");
     embed.setThumbnail(data[player].art);
     return embed;
 }
@@ -237,6 +237,32 @@ function InstancePlayer(player){
     console.log("New data");
 }
 
+function PlayerBase(isAdmin = false){
+    const players = new Discord.RichEmbed()
+    players.setTitle("Current Playerbase")
+
+    var base = [];
+
+    for(var key in data){          
+        try{
+            if(data[key].name != undefined){
+                if(!isAdmin){
+                    base.push(data[key].name);
+                } else {
+                    base.push(data[key].name + " " + data[key].points + " points.");
+                }
+            }  
+        } catch(e) {
+            console.log(e);
+            console.log("Not a player");
+        }       
+    }
+
+    players.addField("Interesting:",base);
+
+    return players;
+}
+
 bot.on('ready', () => {
 
     console.log("Raring to go!");
@@ -277,29 +303,14 @@ bot.on('message', message=> {
     //Admin Powers
     var admin;
     if(message.channel.type === "text"){
-        admin = message.guild.roles.find(role => role.name === "Guild Master").id;
+        admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
     }  
     
     switch(args[0]){
         //Check who has data
         case 'player':
-            if(!message.member.roles.has(admin)){
-                message.author.send("You do not have the necessary roles.");
-                return;
-            }
-            var players = [];
-            for(var key in data){          
-                try{
-                    players.push(data[key].name + " points: " + data[key].points);
-                } catch(e) {
-                    console.log(e);
-                    console.log("Not a player");
-                }       
-            }
-            const play = new Discord.RichEmbed()
-                play.setTitle("Current Playerbase");
-                play.addField("Players",players);
-                message.author.send(play);
+            var play = PlayerBase(admin);
+            message.author.send(play);
             message.delete();
         break;
         //Check the loot tables!
