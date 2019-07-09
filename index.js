@@ -186,13 +186,12 @@ function AddCoins(player,amount){
 }
 
 //Roll the Slots
-var limit = 25;
+var limit = 20;
 function Slots(player,amount){
     const embed = new Discord.RichEmbed();
-    embed.setTitle(data[player].name + "'s is Spinning Slots!")
+    embed.setTitle(data[player].name + " is Spinning Slots!")
     embed.setThumbnail(data[player].art);
-
-    
+  
     if(conditions.GreaterThan(data[player].coins,amount)){
         //Points Configuration and Set up Result
         var points = spawn_table["POINTS"];
@@ -269,6 +268,9 @@ bot.on('message', message=> {
     if(!data[player].coins){
         data[player].coins = 0;
     }
+    if(!data.jackpot){
+        data.jackpot = 0;
+    }
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
@@ -300,12 +302,29 @@ bot.on('message', message=> {
                 message.author.send(play);
             message.delete();
         break;
+        //Check the loot tables!
+        case 'slots':
+            const check = new Discord.RichEmbed()
+            check.setTitle("Prize Pool")
+            var pool = [];
+
+            pool.push("10 Points  -  ~53%")
+            pool.push("30 Points  -  ~23%")
+            pool.push("50 Points  -  ~11%")
+            pool.push("200 Points  -  ~6%")
+            pool.push("800 Points  -  ~2%")
+            pool.push("-100 Points(Whammie) -  ~2%")
+            pool.push("2000 Points(Jackpot) -  ~1%")
+
+            check.addField("Good Luck:",pool)
+        break;
         case 'play':
             //Play various arcade games!
             if(!args[1]){
                 message.author.send("You forgot to select something to play: You can pick: ")
                 return;
             }
+
             switch(args[1]){
                 case "slots":
                     if(args[2]){
@@ -322,7 +341,7 @@ bot.on('message', message=> {
 
                         } catch (e){
                             console.log(e);
-                            console.log("Invalid Number");
+                            message.reply("Sorry, please try again!");
                         }
                     } else {
                         var slot = Slots(player,1);

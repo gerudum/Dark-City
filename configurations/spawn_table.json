@@ -28,37 +28,37 @@
     "POINTS":{
         "TINY":{
             "amount":10,
-            "name":" points",
+            "name":", meh.",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "SMALL":{
             "amount":30,
-            "name":" cool!",
+            "name":", cool!",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "MEDIUM":{
             "amount":50,
-            "name":" not bad!",
+            "name":", not bad!",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "LARGE":{
             "amount":200,
-            "name":" nice!",
+            "name":", nice!",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "EXTRA LARGE":{
             "amount":800,
-            "name":" big win!",
+            "name":", big win!",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "JACKPOT":{
             "amount":2000,
-            "name":" you hit the jackpot!",
+            "name":", you hit the jackpot!",
             "emote":"<:fiendpoints:597928183358160908>"
         },
         "WHAMMIE":{
             "amount":-100,
-            "name":" you hit the whammie!",
+            "name":", you hit the whammie!...",
             "emote":"<:whammie:597933448220508161>"
         }
     },
