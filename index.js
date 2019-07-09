@@ -186,23 +186,32 @@ function AddCoins(player,amount){
 }
 
 //Roll the Slots
-function Slots(player){
+var limit = 25;
+function Slots(player,amount){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name + "'s is Spinning Slots!")
-    if(conditions.GreaterThan(data[player].coins,1)){
-        var drop = Spawn(spawn_table["CASINO"]);
+    embed.setThumbnail(data[player].art);
+
+    
+    if(conditions.GreaterThan(data[player].coins,amount)){
+        //Points Configuration and Set up Result
         var points = spawn_table["POINTS"];
-        data[player].coins -= 1;
-        //Add Points
-        AddPoints(player,points[drop].amount)
-        //Whammie! Too bad for you!
-        if(conditions.LessThan(points[drop].amount,0)){
-            embed.addField("You hit the Whammie!","<:whammie:597933448220508161>")
+        var result = [];
+
+        //Roll the loot
+        for(var i = 0; i < amount; i++){
+            var drop = Spawn(spawn_table["CASINO"]);
+            AddPoints(player,points[drop].amount);
+            result.push(points[drop].amount + " points " + points[drop].name + points[drop].emote);
         }
-        embed.addField("Result:","You have won... " + points[drop].amount + " points! <:fiendpoints:597928183358160908>");
+       
+        //Substract the Coins
+        AddCoins(player,-amount);
+       
+        embed.addField("Result:",result);
 
     } else {
-        embed.addField("Result:","You do not have enough coins to spin! 1 coin per spin!")
+        embed.addField("Result:","You do not have enough coins to spin! 1 coin per spin! Your Coins: " + data[player].coins )
     }
     return embed;
 }
@@ -258,7 +267,7 @@ bot.on('message', message=> {
     }
 
     if(!data[player].coins){
-        data[player].coins = 10;
+        data[player].coins = 0;
     }
 
     //Arguments
@@ -298,9 +307,27 @@ bot.on('message', message=> {
             }
             switch(args[1]){
                 case "slots":
-                    var slot = Slots(player);
-                    message.channel.send(slot);
+                    if(args[2]){
+                        try {
+                            var amount = parseInt(args[2]);
+                            
+                            if(amount >= spinLimit){
+                                message.author.reply("Maximum Number of spins at once is " + limit);
+                                return;
+                            }
+
+                            var slot = Slots(player,amount);
+                            message.channel.send(slot);
+
+                        } catch (e){
+                            console.log("Invalid Number");
+                        }
+                    } else {
+                        var slot = Slots(player,1);
+                        message.channel.send(slot);
+                    }
                 break;
+                //TODO:
                 case "cards":
                 break;
             }
