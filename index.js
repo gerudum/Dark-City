@@ -123,8 +123,8 @@ function Roll(loot, weights){
 function CheckPoints(player){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name);
-    embed.addField("Fiend Points",data[player].points + "<:fiendpoints:598240296014184451>");
-    embed.addField("Fiend Tokens", data[player].coins + "<:fiendcoin:598240273662738433>");
+    embed.addField("Fiend Points",data[player].points + "<:fiendcoin:598240273662738433>");
+    embed.addField("Fiend Tokens", data[player].coins + "<:fiendpoints:598240296014184451>");
     embed.setThumbnail(data[player].art);
     return embed;
 }
