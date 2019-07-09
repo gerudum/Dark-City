@@ -290,6 +290,7 @@ bot.on('message', message=> {
                 try{
                     players.push(data[key].name + " points: " + data[key].points);
                 } catch(e) {
+                    console.log(e);
                     console.log("Not a player");
                 }       
             }
@@ -320,6 +321,7 @@ bot.on('message', message=> {
                             message.channel.send(slot);
 
                         } catch (e){
+                            console.log(e);
                             console.log("Invalid Number");
                         }
                     } else {
@@ -523,27 +525,6 @@ bot.on('message', message=> {
         message.delete();
         break;
 
-        //#region Deprecated
-        case 'list':
-          if(!message.member.roles.has(admin)){
-              message.author.send("You do not have the necessary roles.").
-              return;
-          }
-        if (!args[1]) {
-                message.author.send("Please specify something to Inform.");
-                return;
-            }
-            var list = "";
-            for (var i = 1; i < args.length; i++) {
-                list += args[i].toString();
-                if (args[i + 1] != null) {
-                    list += " ";
-                }
-            }   
-            CreateListing(bot.channels.get(message.channel.id),list);
-        message.delete();
-        break;
-        //#endregion
         case 'rsrc':
             message.author.send("https://imgur.com/a/WISJigc");
         message.delete();
