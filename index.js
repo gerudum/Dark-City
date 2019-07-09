@@ -186,7 +186,7 @@ function AddCoins(player,amount){
 }
 
 //Roll the Slots
-var limit = 20;
+var limit = 10;
 function Slots(player,amount){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name + " is Spinning Slots!")
@@ -317,6 +317,7 @@ bot.on('message', message=> {
             pool.push("2000 Points(Jackpot) -  ~1%")
 
             check.addField("Good Luck:",pool)
+            message.channel.send(check);
         break;
         case 'play':
             //Play various arcade games!
