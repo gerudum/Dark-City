@@ -311,7 +311,7 @@ bot.on('message', message=> {
                         try {
                             var amount = parseInt(args[2]);
                             
-                            if(amount >= spinLimit){
+                            if(amount >= limit){
                                 message.author.reply("Maximum Number of spins at once is " + limit);
                                 return;
                             }
