@@ -46,8 +46,9 @@ function SaveData(){
 
 //Sending to channels
 function AddGlyph(deal){
+    const embed = new Discord.RichEmbed().setImage(glyph[deal].icon)
     var shop = bot.channels.get("596021725620207682");
-    shop.send(glyph[deal].icon);
+    shop.send(embed);
 }
 
 //Send information to channels
@@ -444,7 +445,7 @@ bot.on('message', message=> {
             for (var key in glyph){
                 deal.push(key);
             }
-            deals.addField("Deals: ", deal);
+            deals.addField("Deals(You don't need to capitalize) ", deal);
 
             message.author.send(deals);
         break;
