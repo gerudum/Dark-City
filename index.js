@@ -19,6 +19,7 @@ setInterval(() => {
 
 let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
 let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
+let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
 var conditions = require("./conditions.js");
 
@@ -44,19 +45,9 @@ function SaveData(){
 }
 
 //Sending to channels
-function AddGlyph(deal,price,gerudum){
-    if(!data.listing){
-        data.listing = {};
-    }
+function AddGlyph(deal){
     var shop = bot.channels.get("596021725620207682");
-    const listing = new Discord.RichEmbed()
-
-    listing.setTitle("Glyph Shop Deal!")
-    listing.addField("Deal",deal)
-    listing.addField("Cost in Fiend Points",price)
-    listing.setThumbnail(manage.announcement)
-    
-    shop.send(listing);
+    shop.send(glyph[deal].icon);
 }
 
 //Send information to channels
@@ -311,7 +302,7 @@ bot.on('message', message=> {
         case 'player':
             var play = PlayerBase(admin);
             message.author.send(play);
-            message.delete();
+            //message.delete();
         break;
         //Check the loot tables!
         case 'slots':
@@ -387,7 +378,7 @@ bot.on('message', message=> {
                         message.author.send(amount + " coins Added to " + data[key].name);
                     } 
                 }        
-            message.delete();
+            //message.delete();
         break;
         //Add Points
         case 'add':
@@ -411,44 +402,52 @@ bot.on('message', message=> {
                         message.author.send(amount + " points Added to " + data[key].name);
                     } 
                 }        
-            message.delete();
+            //message.delete();
         break;
 
         //Check your points
         case 'points':
             var bank = CheckPoints(player);
             message.channel.send(bank);
-            message.delete();
+            //message.delete();
         break;
 
         //Set a glyph deal
         case 'glyph':
             if(!message.member.roles.has(admin)){
-                message.author.send("You do not have the necessary roles.").
+                message.reply("You do not have the necessary roles.").
+                return;
+            } else if (!args[1]) {
+                message.reply("Please specify something to List.");
+                return;
+            } else if(args.length > 2){
+                message.reply("Please replace spaces with underscores.");
+                return;
+            } else if(!glyph[args[1].toUpperCase()]){
+                message.reply(args[1].toUpperCase() + " doesn't exist, check spelling?  For a list of all available deals, do /shop");
                 return;
             }
-            if (!args[1]) {
-                message.author.send("Please specify something to List.");
-                return;
-            }
-            var listing = "";
-            var index = 0;
-            for (var i = 1; i < args.length; i++) {
-                    if(args[i] != args[args.length - 1]){
-                        listing += args[i].toString();
-                    }
-                  
-                    if (args[i] != args[args.length - 1]) {
-                        listing += " ";
-                    } else {
-                      index = i;
-                    }
-            } 
-            var price = parseInt(args[index]);
-            AddGlyph(listing,price,message.author);
+            AddGlyph(args[1].toUpperCase());
             message.delete();       
         break;
 
+        case 'shop':
+            if(!message.member.roles.has(admin)){
+                message.reply("You do not have the necessary roles.").
+                return;
+            } 
+            
+            const deals = new Discord.RichEmbed()
+            deals.setTitle("Available Deals");
+
+            var deal = [];
+            for (var key in glyph){
+                deal.push(key);
+            }
+            deals.addField("Deals: ", deal);
+
+            message.author.send(deals);
+        break;
         //Announce something
         case 'announce':
             if(!message.member.roles.has(admin)){
@@ -467,7 +466,7 @@ bot.on('message', message=> {
                 }
             }   
             CreateAnnouncement(announcement,0);
-        message.delete();
+        //message.delete();
         break;   
 
         //Add Weight to a player
@@ -488,7 +487,7 @@ bot.on('message', message=> {
                     message.author.send("Entries Added");
                 } 
             }    
-            message.delete();
+            //message.delete();
         break;
 
         //Draw a raffle
@@ -498,7 +497,7 @@ bot.on('message', message=> {
                 return;
             }
             Raffle();
-            message.delete();
+            //message.delete();
         break;
 
         //Check people's weights
@@ -511,7 +510,7 @@ bot.on('message', message=> {
           embed.setTitle("Checking")
           embed.addField("People",available);
           message.author.send(embed);
-          message.delete();
+          //message.delete();
         break;
 
         //Info
@@ -532,7 +531,7 @@ bot.on('message', message=> {
                 }
             }   
             CreateAnnouncement(announcement,1);
-        message.delete();
+        //message.delete();
         break;
 
         //Job Channel
@@ -553,12 +552,12 @@ bot.on('message', message=> {
                 }
             }   
             CreateAnnouncement(job,2);
-        message.delete();
+        //message.delete();
         break;
 
         case 'rsrc':
             message.author.send("https://imgur.com/a/WISJigc");
-        message.delete();
+        //message.delete();
         break;
         
     }  
