@@ -1,9 +1,7 @@
 const Discord = require('discord.js');
 
-
 //Imaging
-const Canvas = require('canvas')
-
+const Canvas = require('canvas');
 
 const bot = new Discord.Client();
 const http = require('http');
@@ -44,17 +42,10 @@ function Validate(json){
 function SaveData(){
     //SaveData here
     if(Validate(data)){
-        fs.writeFile('.data/data.json', JSON.stringify(data), (err) =>{
+        fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
             if (err) console.error(err);
         })
     }
-}
-
-//Sending to channels
-function AddGlyph(deal){
-    const embed = new Discord.RichEmbed().setImage(glyph[deal].icon)
-    var shop = bot.channels.get("596021725620207682");
-    shop.send(embed);
 }
 
 //Send information to channels
@@ -105,7 +96,6 @@ function Raffle(){
     channel.send(raffle);
     
 }
-
 function Roll(loot, weights){
     var top = 0;
     var total = 0;
@@ -119,16 +109,6 @@ function Roll(loot, weights){
             return loot[i];                         
         }                 
     }   
-}
-
-//Check your points
-function CheckPoints(player){
-    const embed = new Discord.RichEmbed();
-    embed.setTitle(data[player].name);
-    embed.addField("Fiend Points",data[player].points + "<:fiendcoin:598240273662738433>");
-    embed.addField("Fiend Tokens", data[player].coins + "<:fiendpoints:598240296014184451>");
-    embed.setThumbnail(data[player].art);
-    return embed;
 }
 
 //Find Player
@@ -189,7 +169,7 @@ function AddCoins(player,amount){
 
 //Roll the Slots
 var limit = 10;
-function Slots(player,amount){
+function Slots(player,amount,channel){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name + " is Spinning Slots!")
     embed.setThumbnail(data[player].art);
@@ -197,39 +177,76 @@ function Slots(player,amount){
     if(conditions.GreaterThan(data[player].coins,amount)){
         //Points Configuration and Set up Result
         var points = spawn_table["POINTS"];
-        var result = [];
+        var result = {};
 
         //Roll the loot
         for(var i = 0; i < amount; i++){
             var drop = Spawn(spawn_table["CASINO"]);
             AddPoints(player,points[drop].amount);
-            result.push(points[drop].amount + " points " + points[drop].name + points[drop].emote);
+            result[i] = {};
+            result[i].amount = points[drop].amount;
+            result[i].name = points[drop].name;
+            result[i].image = points[drop].image;
         }
        
         //Substract the Coins
         AddCoins(player,-amount);
        
-        embed.addField("Result:",result);
+        Slots_Result(player,result,amount,channel);
 
-    } else {
-        embed.addField("Result:","You do not have enough coins to spin! 1 coin per spin! Your Coins: " + data[player].coins )
     }
-    return embed;
 }
+async function Slots_Result(player,result,amount,channel){
+    const canvas = Canvas.createCanvas(400, 100 + (amount * 80));
+    const ctx = canvas.getContext('2d');
+    const background = await Canvas.loadImage(glyph.background);
+    const border = await Canvas.loadImage(glyph.border);
+    const backing = await Canvas.loadImage(glyph.token_holder);
+    const tokens =  await Canvas.loadImage(glyph.coins);
 
-//#region Unused TODO
-function CreateID(){
-    if(!data.id){
-        data.id = [];
+    ctx.drawImage(background,0, 0, canvas.width, canvas.height);
+   
+   
+    ctx.font = "600 30px Arial";
+    ctx.lineWidth = 8;
+
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.strokeText(data[player].name + "'s Results",200,50);
+
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(data[player].name + "'s Results",200,50);
+
+    var offset = 60;
+    var distance = 70;
+    for(var i = 0; i < amount; i++ ){
+        var icon = await Canvas.loadImage(result[i].image);
+        ctx.drawImage(icon , 25 , offset + (i * distance), 50, 50);
+
+        ctx.lineWidth = 8;
+        ctx.textAlign = "start";
+        ctx.strokeStyle = "black";
+        ctx.strokeText(result[i].amount,75,(offset + 30) + (i * distance));
+    
+        ctx.fillStyle = "#FCDB00";
+        ctx.fillText(result[i].amount,75,(offset + 30) + (i * distance));
     }
-    var id = 0;
-    for(var i = 0; i < data.id.length; i++){
-        id++;
-    }
-    data.id.push(id);
-    return id;
+
+
+    ctx.drawImage(border,0, 0, canvas.width, canvas.height);
+
+    //Tokens Remaining
+   
+    ctx.drawImage(backing,0,canvas.height - 80,140,80)
+    ctx.drawImage(tokens, 24, canvas.height - 60,40,40);
+
+    ctx.font = "600 20px Arial";
+    ctx.fillText(data[player].coins, offset + 40, canvas.height - 5);
+
+    const attachment = new Discord.Attachment(canvas.toBuffer(), 'slots.png');
+
+    channel.send(attachment);
 }
-//#endregion
 
 function InstancePlayer(player){
     data[player] = {};
@@ -265,8 +282,69 @@ function PlayerBase(isAdmin = false){
     return players;
 }
 
+//Viewing the player bank
+async function Bank(icon,player,channel,rank){
+    const canvas = Canvas.createCanvas(400, 200);
+    const ctx = canvas.getContext('2d');
+    const background = await Canvas.loadImage(glyph.background);
+    const nameplate = await Canvas.loadImage(glyph.nameplate); 
+    const coin_icon = await Canvas.loadImage(glyph.coins);
+    const point_icon = await Canvas.loadImage(glyph.points);
+    const player_icon = await Canvas.loadImage(icon);
+    const border = await Canvas.loadImage(glyph.border); 
 
-//Image Stuff - Make the bot look nice
+    ctx.drawImage(background,0, 0, canvas.width, canvas.height);
+    ctx.drawImage(player_icon, 275,50,100,100);
+    ctx.drawImage(nameplate, 240, 0, 175, 50);
+
+    ctx.drawImage(coin_icon, 5,135,50,50);
+    ctx.drawImage(point_icon, 5,90,50,50);
+    ctx.drawImage(border,0,0,canvas.width,canvas.height);
+
+    var coins = data[player].coins.toString();
+    var points = data[player].points.toString();
+
+    ctx.font = "600 15px Arial";
+
+    //Name
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(data[player].name,325,25);
+
+    ctx.font = "600 20px Arial";
+
+    //Points
+    ctx.lineWidth = 8;
+    ctx.textAlign = "start";
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Points " + points,60,125);
+    
+ 
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Points " + points,60,125);
+
+    //Coins
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Tokens " + coins,60,175);
+    
+    ctx.textAlign = "start";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Tokens " + coins,60,175);
+
+    //Rank
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.strokeText(rank,325,160);
+
+    ctx.fillStyle = "#A60EE6";
+    ctx.fillText(rank,325,160);
+
+    const attachment = new Discord.Attachment(canvas.toBuffer(), 'player_stats.png');
+
+    channel.send(attachment); 
+}
+//Create Listing on the Glyph Shop
 async function CreateImage(image,name,price){
     var channel = bot.channels.get("596021725620207682");
 	const canvas = Canvas.createCanvas(400, 400);
@@ -279,7 +357,7 @@ async function CreateImage(image,name,price){
         combinedName += " ";
     }
 	// Since the image takes time to load, you should await it
-    const background = await Canvas.loadImage(glyph["BACKGROUND"]);
+    const background = await Canvas.loadImage(glyph.background);
 
     try{
         const test = await Canvas.loadImage(image);
@@ -290,9 +368,9 @@ async function CreateImage(image,name,price){
 
     //Create Image
     const item = await Canvas.loadImage(image);
-    const fiend = await Canvas.loadImage(glyph["ICON_FIEND"]);
-    const top_border = await Canvas.loadImage(glyph["BORDER_TOP"]);
-    const bottom_border = await Canvas.loadImage(glyph["BORDER_BOTTOM"]);
+    const fiend = await Canvas.loadImage(glyph.icon_fiend);
+    const top_border = await Canvas.loadImage(glyph.border_top);
+    const bottom_border = await Canvas.loadImage(glyph.border_bottom);
 
     // This uses the canvas dimensions to stretch the image onto the entire canvas
     ctx.drawImage(background, 1.5, 9, canvas.width - 2, canvas.height - 30);
@@ -327,6 +405,20 @@ async function CreateImage(image,name,price){
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
     channel.send(attachment);
 }
+
+//Get the JSONs currently on disk
+function Log(channel,json){
+    const attachment = new Discord.Attachment(json);
+    channel.send(attachment);
+}
+function CreateTXT(){
+    var stream = fs.createWriteStream("log.txt");
+    stream.once('open', function(fd) {
+        stream.write("My first row\n");
+        stream.end();
+    })
+}
+
 bot.on('ready', () => {
 
     console.log("Raring to go!");
@@ -377,8 +469,21 @@ bot.on('message', message=> {
             message.author.send(play);
             //message.delete();
         break;
-        case 'test':
-            
+        case 'log':
+            switch (args[1]) {
+                case 'data':
+                    Log(message.channel,'.data/data.json');
+                break;
+                case 'spawn_table':
+                    Log(message.channel,'configurations/spawn_table.json');
+                break;
+                case 'management':
+                    Log(message.channel,'configurations/management.json');
+                break;
+                case 'shop':
+                    Log(message.channel,'configurations/shop.json');
+                break;
+            }
         break;
         //Check the loot tables!
         case 'slots':
@@ -415,20 +520,16 @@ bot.on('message', message=> {
                                 return;
                             }
 
-                            var slot = Slots(player,amount);
-                            message.channel.send(slot);
+                            Slots(player,amount,message.channel);
 
                         } catch (e){
                             console.log(e);
                             message.reply("Sorry, please try again!");
                         }
                     } else {
-                        var slot = Slots(player,1);
-                        message.channel.send(slot);
+                        //Default to 1 if no spin limit is specified.
+                        Slots(player,1,message.channel);
                     }
-                break;
-                //TODO:
-                case "cards":
                 break;
             }
         break;
@@ -483,9 +584,17 @@ bot.on('message', message=> {
 
         //Check your points
         case 'points':
-            var bank = CheckPoints(player);
-            message.channel.send(bank);
-            //message.delete();
+            var rank = "Gorgo";
+            if(message.member.roles.find(r => r.name === "Devilite")){
+                rank = "Devilite";
+            } else if (message.member.roles.find(r => r.name === "Devilite Overtimer ")){
+                rank = "Devilite Overtimer";
+            } else if (message.member.roles.find(r => r.name === "Yesman")){
+                rank = "Yesman";
+            } else if (message.member.roles.find(r => r.name === "Pit Boss")){
+                rank = "Pit Boss";
+            }
+            Bank(message.author.avatarURL,player,message.channel,rank);
         break;
 
         //Set a glyph deal
