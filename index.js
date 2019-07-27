@@ -1,4 +1,10 @@
 const Discord = require('discord.js');
+
+
+//Imaging
+const Canvas = require('canvas')
+
+
 const bot = new Discord.Client();
 const http = require('http');
 const express = require('express');
@@ -77,6 +83,7 @@ function CreateAnnouncement(announcement,id = 0){
     channel.send(news);
 }
 
+//Raffle
 function Raffle(){
     var players = [];
     var weights = [];
@@ -89,6 +96,7 @@ function Raffle(){
     raffle.setTitle("Raffle!")
     raffle.setThumbnail(manage.announcement)
     for(var i = 0 ; i < manage.prize.length; i++){
+        //Roll the winner
         var winner = Roll(players,weights);
         raffle.addField("The winner for the " + manage.prize[i] + " is... " + winner + " !", "Congratulations!")
     }
@@ -97,6 +105,7 @@ function Raffle(){
     channel.send(raffle);
     
 }
+
 function Roll(loot, weights){
     var top = 0;
     var total = 0;
@@ -112,6 +121,7 @@ function Roll(loot, weights){
     }   
 }
 
+//Check your points
 function CheckPoints(player){
     const embed = new Discord.RichEmbed();
     embed.setTitle(data[player].name);
@@ -255,6 +265,54 @@ function PlayerBase(isAdmin = false){
     return players;
 }
 
+
+//Image Stuff - Make the bot look nice
+async function CreateImage(image,name,price,channel){
+	const canvas = Canvas.createCanvas(400, 400);
+    const ctx = canvas.getContext('2d');
+    
+	// Since the image takes time to load, you should await it
+    const background = await Canvas.loadImage(glyph["BACKGROUND"]);
+
+    try{
+        const test = await Canvas.loadImage(image);
+    } catch(e){
+        channel.send("Invalid Image");
+        return;
+    }
+
+    //Create Image
+    const item = await Canvas.loadImage(image);
+    const fiend = await Canvas.loadImage(glyph["ICON_FIEND"]);
+    const top_border = await Canvas.loadImage(glyph["BORDER_TOP"]);
+    const bottom_border = await Canvas.loadImage(glyph["BORDER_BOTTOM"]);
+    
+    // This uses the canvas dimensions to stretch the image onto the entire canvas
+    ctx.drawImage(background, 1.5, 12, canvas.width - 2, canvas.height - 17);
+    ctx.drawImage(top_border,0 , 0, canvas.width, 50);
+    ctx.drawImage(bottom_border, 0, 350, canvas.width,50);
+
+
+    //Draw this in the center
+    ctx.drawImage(item, 67, 67, canvas.width/1.5, canvas.height/1.5);
+    ctx.drawImage(fiend, 50, 58, 50,50);
+
+    ctx.drawImage
+    ctx.font = "600 30px Arial";
+    ctx.textAlign = "start";
+    ctx.fillStyle = "yellow";
+    ctx.fillText(name,25,350);
+
+    ctx.font = "600 50px Arial"
+    ctx.textAlign = "start";
+    ctx.fillStyle = "purple";
+    ctx.fillText(price,100,100);
+
+	// Use helpful Attachment class structure to process the file for you
+	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
+
+    channel.send(attachment);
+}
 bot.on('ready', () => {
 
     console.log("Raring to go!");
@@ -304,6 +362,9 @@ bot.on('message', message=> {
             var play = PlayerBase(admin);
             message.author.send(play);
             //message.delete();
+        break;
+        case 'test':
+            
         break;
         //Check the loot tables!
         case 'slots':
@@ -415,20 +476,16 @@ bot.on('message', message=> {
 
         //Set a glyph deal
         case 'glyph':
-            if(!message.member.roles.has(admin)){
-                message.reply("You do not have the necessary roles.").
-                return;
-            } else if (!args[1]) {
-                message.reply("Please specify something to List.");
-                return;
-            } else if(args.length > 2){
-                message.reply("Please replace spaces with underscores.");
-                return;
-            } else if(!glyph[args[1].toUpperCase()]){
-                message.reply(args[1].toUpperCase() + " doesn't exist, check spelling?  For a list of all available deals, do /shop");
+            if(args.length < 3){
+                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price]")
                 return;
             }
-            AddGlyph(args[1].toUpperCase());
+            try{
+                CreateImage(args[1],args[2],args[3].toString(),message.channel);
+                message.delete();
+            } catch(e){
+                console.log(e);
+            }
             message.delete();       
         break;
 

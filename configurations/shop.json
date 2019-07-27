@@ -1,11 +1,6 @@
-{"LIGHTNING_CAPACITOR_RECIPE":{
-"icon":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fglyph_shop_deal_capacitor.png?v=1564179359714"
-},"WRENCH_WAND_RECIPE":{
-"icon":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fglyph_shop_deal_wrench.png?v=1564179358975"
-},
-"THWACK_HAMMER_RECIPE":{
-"icon":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fglyph_shop_deal_thwack.png?v=1564179359220"
-},
-"TOXIC_CATALYZER_RECIPE":{
-"icon":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fglyph_shop_deal_toxic_catalyzer.png?v=1564179359086"
-}}
+{
+    "BACKGROUND":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fbackground_featured.png?1564194416782",
+    "BORDER_BOTTOM":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fpromotab_bottom.png?1564194419470",
+    "BORDER_TOP":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Fpromotab_top.png?1564194419078",
+    "ICON_FIEND":"https://cdn.glitch.com/e74c951b-f062-4dea-ba95-ffe2251ecfc3%2Ffiend.png?1564193706270"
+}
