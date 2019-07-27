@@ -302,11 +302,14 @@ async function CreateImage(image,name,price,channel){
     ctx.textAlign = "start";
     ctx.fillStyle = "yellow";
     ctx.fillText(name,25,350);
+    ctx.strokeStyle = "black";
+    ctx.strokeText(price,100,100);
 
     ctx.font = "600 50px Arial"
     ctx.textAlign = "start";
     ctx.fillStyle = "purple";
     ctx.fillText(price,100,100);
+    
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
