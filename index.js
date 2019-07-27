@@ -267,10 +267,17 @@ function PlayerBase(isAdmin = false){
 
 
 //Image Stuff - Make the bot look nice
-async function CreateImage(image,name,price,channel){
+async function CreateImage(image,name,price){
+    var channel = bot.channels.get("596021725620207682");
 	const canvas = Canvas.createCanvas(400, 400);
     const ctx = canvas.getContext('2d');
     
+    var newName = name.split("_");
+    var combinedName = "";
+    for(var i = 0; i < newName.length; i++){
+        combinedName += newName[i];
+        combinedName += " ";
+    }
 	// Since the image takes time to load, you should await it
     const background = await Canvas.loadImage(glyph["BACKGROUND"]);
 
@@ -287,8 +294,11 @@ async function CreateImage(image,name,price,channel){
     const top_border = await Canvas.loadImage(glyph["BORDER_TOP"]);
     const bottom_border = await Canvas.loadImage(glyph["BORDER_BOTTOM"]);
     
+
+
+
     // This uses the canvas dimensions to stretch the image onto the entire canvas
-    ctx.drawImage(background, 1.5, 12, canvas.width - 2, canvas.height - 17);
+    ctx.drawImage(background, 1.5, 9, canvas.width - 2, canvas.height - 30);
     ctx.drawImage(top_border,0 , 0, canvas.width, 50);
     ctx.drawImage(bottom_border, 0, 350, canvas.width,50);
 
@@ -297,22 +307,34 @@ async function CreateImage(image,name,price,channel){
     ctx.drawImage(item, 67, 67, canvas.width/1.5, canvas.height/1.5);
     ctx.drawImage(fiend, 50, 58, 50,50);
 
-    ctx.drawImage
+    
     ctx.font = "600 30px Arial";
-    ctx.textAlign = "start";
-    ctx.fillStyle = "yellow";
-    ctx.fillText(name,25,350);
+
+    ctx.lineWidth = 8;
     ctx.strokeStyle = "black";
-    ctx.strokeText(price,100,100);
+    ctx.strokeText(combinedName,25,350);
+    
+    ctx.textAlign = "start";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(combinedName,25,350);
+    
+   
 
     ctx.font = "600 50px Arial"
     ctx.textAlign = "start";
-    ctx.fillStyle = "purple";
+    ctx.fillStyle = "#A60EE6";
     ctx.fillText(price,100,100);
+
+    ctx.font = "600 30px Arial"
+    ctx.fillStyle = "#FFD9C4";
+    ctx.textAlign = "center";
+    ctx.fillText("Ends Anytime!",200,385);
+
     
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
+
 
     channel.send(attachment);
 }
@@ -488,8 +510,7 @@ bot.on('message', message=> {
                 message.delete();
             } catch(e){
                 console.log(e);
-            }
-            message.delete();       
+            }    
         break;
 
         case 'shop':
