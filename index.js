@@ -20,11 +20,13 @@ setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 280000);
 
-
-let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
-let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
-let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
+
+
+let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
+let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
+let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
+
 var conditions = require("./conditions.js");
 
 //Saving Data, Make sure the json is good before saving it.
@@ -255,7 +257,6 @@ function InstancePlayer(player){
     data[player].coins = 0;
     console.log("New data");
 }
-
 function PlayerBase(isAdmin = false){
     const players = new Discord.RichEmbed()
     players.setTitle("Current Playerbase")
@@ -286,7 +287,8 @@ function PlayerBase(isAdmin = false){
 async function Bank(icon,player,channel,rank){
     const canvas = Canvas.createCanvas(400, 200);
     const ctx = canvas.getContext('2d');
-    const background = await Canvas.loadImage(glyph.background);
+    const background = await Canvas.loadImage(glyph.background_fiendish);
+    const fiend_icon = await Canvas.loadImage(glyph.icon_fiendish);
     const nameplate = await Canvas.loadImage(glyph.nameplate); 
     const coin_icon = await Canvas.loadImage(glyph.coins);
     const point_icon = await Canvas.loadImage(glyph.points);
@@ -299,6 +301,7 @@ async function Bank(icon,player,channel,rank){
 
     ctx.drawImage(coin_icon, 5,135,50,50);
     ctx.drawImage(point_icon, 5,90,50,50);
+    ctx.drawImage(fiend_icon, 15, 15, 60, 60);
     ctx.drawImage(border,0,0,canvas.width,canvas.height);
 
     var coins = data[player].coins.toString();
@@ -347,7 +350,7 @@ async function Bank(icon,player,channel,rank){
 //Create Listing on the Glyph Shop
 async function CreateImage(image,name,price){
     var channel = bot.channels.get("596021725620207682");
-	const canvas = Canvas.createCanvas(400, 400);
+	const canvas = Canvas.createCanvas(250, 250);
     const ctx = canvas.getContext('2d');
     
     var newName = name.split("_");
@@ -375,31 +378,33 @@ async function CreateImage(image,name,price){
     // This uses the canvas dimensions to stretch the image onto the entire canvas
     ctx.drawImage(background, 1.5, 9, canvas.width - 2, canvas.height - 30);
     ctx.drawImage(top_border,0 , 0, canvas.width, 50);
-    ctx.drawImage(bottom_border, 0, 350, canvas.width,50);
+    ctx.drawImage(bottom_border, 0, 200, canvas.width,50);
 
     //Draw this in the center
-    ctx.drawImage(item, 67, 67, canvas.width/1.5, canvas.height/1.5);
-    ctx.drawImage(fiend, 50, 58, 50,50);
+    ctx.drawImage(item, canvas.width/1.5/4, canvas.width/1.5/4, canvas.width/1.5, canvas.height/1.5);
+    ctx.drawImage(fiend, 40,35, 40,40);
     
-    ctx.font = "600 30px Arial";
+    ctx.font = "600 15px Arial";
 
     ctx.lineWidth = 8;
     ctx.strokeStyle = "black";
-    ctx.strokeText(combinedName,25,350);
+    ctx.strokeText(combinedName,25,200);
     
     ctx.textAlign = "start";
     ctx.fillStyle = "#FCDB00";
-    ctx.fillText(combinedName,25,350);
+    ctx.fillText(combinedName,25,200);
     
-    ctx.font = "600 50px Arial"
-    ctx.textAlign = "start";
-    ctx.fillStyle = "#A60EE6";
-    ctx.fillText(price,100,100);
-
     ctx.font = "600 30px Arial"
+    ctx.textAlign = "start";
+    ctx.lineWidth = 4;
+    ctx.strokeText(price,80,65);
+    ctx.fillStyle = "#A60EE6";
+    ctx.fillText(price,80,65);
+
+    ctx.font = "600 15px Arial"
     ctx.fillStyle = "#FFD9C4";
     ctx.textAlign = "center";
-    ctx.fillText("Ends Anytime!",200,385);
+    ctx.fillText("Ends Anytime!",125,235);
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
@@ -411,12 +416,12 @@ function Log(channel,json){
     const attachment = new Discord.Attachment(json);
     channel.send(attachment);
 }
-function CreateTXT(){
-    var stream = fs.createWriteStream("log.txt");
-    stream.once('open', function(fd) {
-        stream.write("My first row\n");
-        stream.end();
-    })
+function LogChat(msg){
+    console.log("Logging");
+    var date = new Date();
+    date.get
+    var today = date.getFullYear() + "/" + date.getMonth() + "/" + date.getDate() + " Time: " + date.getHours() + "/"  + date.getMinutes() + "/" + date.getSeconds();
+    fs.appendFileSync('.data/chat.txt',today + " " + msg.author.username + " " + msg + " \n");
 }
 
 bot.on('ready', () => {
@@ -432,11 +437,14 @@ bot.on('message', message=> {
     } 
 
     let player = message.author.id;
-   
+    
     //Incase we need to clear data
     if(!data){
         data = {};
     }
+
+    LogChat(message);
+
     if(!data[player].art){
         data[player].art = message.author.avatarURL;
     }
@@ -446,12 +454,8 @@ bot.on('message', message=> {
         data[player].name = message.author.username;
         data[player].art = message.author.avatarURL;
     }
-
     if(!data[player].coins){
         data[player].coins = 0;
-    }
-    if(!data.jackpot){
-        data.jackpot = 0;
     }
 
     //Arguments
@@ -482,6 +486,9 @@ bot.on('message', message=> {
                 break;
                 case 'shop':
                     Log(message.channel,'configurations/shop.json');
+                break;
+                case 'chat':
+                    Log(message.channel,'.data/chat.txt');
                 break;
             }
         break;
