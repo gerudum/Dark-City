@@ -410,7 +410,23 @@ async function CreateImage(image,name,price){
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
     channel.send(attachment);
 }
+function FixData(){
+// Get the Guild and store it under the variable "list"
+const list = bot.guilds.get("542118518842196010"); 
 
+// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
+list.members.forEach(member => {
+    if(!data[member.user.id]){
+            data[member.user.id] = {};
+            data[member.user.id].name = member.user.username;
+            data[member.user.id].art = member.user.avatarURL;
+            data[member.user.id].coins = 0;
+            data[member.user.id].weight = 0;
+            data[member.user.id].points = 0;
+            console.log("New Data created");
+        }
+    }); 
+}
 //Get the JSONs currently on disk
 function Log(channel,json){
     const attachment = new Discord.Attachment(json);
@@ -444,17 +460,12 @@ bot.on('message', message=> {
     }
 
     LogChat(message);
-
-    if(!data[player].art){
-        data[player].art = message.author.avatarURL;
-    }
     //Instancing Player Data
+
     if(!data[player]){
         InstancePlayer(player);
         data[player].name = message.author.username;
         data[player].art = message.author.avatarURL;
-    }
-    if(!data[player].coins){
         data[player].coins = 0;
     }
 
@@ -468,29 +479,38 @@ bot.on('message', message=> {
     
     switch(args[0]){
         //Check who has data
+        case 'fix':
+            if(admin){
+                FixData();
+            }
+        break;
         case 'player':
-            var play = PlayerBase(admin);
-            message.author.send(play);
+            if(admin){
+                var play = PlayerBase(admin);
+                message.author.send(play);
+            }
             //message.delete();
         break;
         case 'log':
-            switch (args[1]) {
-                case 'data':
-                    Log(message.channel,'.data/data.json');
-                break;
-                case 'spawn_table':
-                    Log(message.channel,'configurations/spawn_table.json');
-                break;
-                case 'management':
-                    Log(message.channel,'configurations/management.json');
-                break;
-                case 'shop':
-                    Log(message.channel,'configurations/shop.json');
-                break;
-                case 'chat':
-                    Log(message.channel,'.data/chat.txt');
-                break;
-            }
+            if(admin){
+                switch (args[1]) {
+                    case 'data':
+                        Log(message.channel,'.data/data.json');
+                    break;
+                    case 'spawn_table':
+                        Log(message.channel,'configurations/spawn_table.json');
+                    break;
+                    case 'management':
+                        Log(message.channel,'configurations/management.json');
+                    break;
+                    case 'shop':
+                        Log(message.channel,'configurations/shop.json');
+                    break;
+                    case 'chat':
+                        Log(message.channel,'.data/chat.txt');
+                    break;
+                }
+            }  
         break;
         //Check the loot tables!
         case 'slots':
