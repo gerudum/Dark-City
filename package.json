@@ -4,13 +4,15 @@
   "description": "Manages Arcade Incorporated Discord",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start":"node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Geru",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.4.2",
-    "express": "^4.16.4"
+    "discord.js": "1.0.0",
+	"canvas":"1.0.0",
+	"discord.js-canvas":"1.0.0",
+	"express":"1.0.0"
   }
 }
