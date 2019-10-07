@@ -35,9 +35,13 @@ class Player {
     }
 }
 
+
 function FindPlayer(data,name){
     for(var key in data){
+        console.log(data[key].name);
+        console.log(name);
         if(data[key].name == name){
+            console.log("Found player");
             return data[key];
         }
     }

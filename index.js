@@ -33,6 +33,10 @@ function Update(){
     }
 }
 
+function Reviver(key, value){
+    return new Player.Player(key);
+}
+
 bot.on('guildMemberAdd', member => {
     member.guild.channels.get('channelID').send("Welcome " + member.displayName); 
 });
@@ -45,6 +49,9 @@ bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
     } 
+
+    let data = JSON.parse('.data/data.json', Reviver);
+
 
     Log.LogChat(message);
 
@@ -101,14 +108,14 @@ bot.on('message', message=> {
                 if(!message.member.roles.has(admin)){ return; }
 
                 try {           
-                    var person = Player.FindPlayer(args[0]);
-                    var amount = parseFloat(args[args.length - 1].toString());
+                    var person = Player.FindPlayer(data,args[1]);
+                    var amount = parseFloat(args[2].toString());
 
                     person.AddCoins(amount);      
                     message.reply(amount + " coins Added to " + person.name);
                 } catch(e) {
                     message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                    console.log(person.name + " " + amount);
+                    console.log(person + " " + amount);
                 }
         break;
 
@@ -120,14 +127,14 @@ bot.on('message', message=> {
                 }
 
                 try {
-                    var person = data[args[0]];
-                    var amount = parseFloat(args[args.length - 1].toString());
+                    var person = Player.FindPlayer(data,args[1]);
+                    var amount = parseInt(args[2]);
                     person.AddPoints(amount);
 
                     message.reply(amount + " points Added to " + person.name); 
                 } catch(e) {
                     message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                    console.log(person.name + " " + amount);
+                    console.log(args[0] +  args[1] + args[2] + " " + amount);
                 }  
         break;      
     }  
