@@ -2,15 +2,21 @@ const Save = require('./save.js');
 const Discord = require('discord.js');
 
 class Listing {
-    constructor(name, price, startDate, endDate, id=0){
+    constructor(name, price, startDate, endDate, id=0,channelID=0){
         this.id = id;
         this.name = name;
         this.price = price;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = GetDate(startDate);
+        this.endDate = GetDate(endDate);
     }
 
-    get Ready(){
+    GetDate(offset){
+        var date = new Date();
+        date.setMinutes(date.getMinutes + offset);
+        return date;
+    }
+
+    Ready(){
         if(this.startDate <= new Date()){
             return true;
         } else {
@@ -18,7 +24,7 @@ class Listing {
         }
     }
 
-    get Ended(){
+    Ended(){
         if(this.endDate <= new Date()){
             return true;
         } else {
@@ -30,6 +36,7 @@ class Listing {
 function ListItem(depot, listing, channel){
     var embed = Discord.RichEmbed();
 
+    //Put it out there!
     embed.SetTitle("Depot Item");
     embed.AddField("Price ", listing.price + " points")
     embed.AddField("End Date ", listing.endDate.ToLocaleString())
@@ -38,6 +45,8 @@ function ListItem(depot, listing, channel){
         listing.id = sentEmbed.id;
     });
 
+    //So it doesn't start multiple times
+    listing.startDate = listing.OffsetDate(1000000);
     depot[listing.name] = listing;
 
     Save.SaveDepot(depot);

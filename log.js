@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Discord = require('discord.js');
 
 function Log (channel, json){
     const attachment = new Discord.Attachment(json);

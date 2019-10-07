@@ -3,7 +3,7 @@ class Table {
         this.entries = entries;
     }
 
-    get Roll(){
+    Roll(){
         var top = 0;
         var total = 0;
 
@@ -25,6 +25,7 @@ class Table {
         return null;
     }
 }
+
 class Entry{
     constructor(result, weight = 5){
         this.result = result;

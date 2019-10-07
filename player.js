@@ -11,7 +11,7 @@ class Player {
     }
 
     //Add Points to the player
-    set AddPoints(amount){
+    AddPoints(amount){
         this.points += amount;
         if(this.points <= 0){
             this.points = 0;
@@ -19,29 +19,25 @@ class Player {
     }
 
     //Add Coins to the player
-    set AddCoins(amount){
+    AddCoins(amount){
         this.coins += amount;
         if(this.coins <= 0){
             this.coins = 0;
         }
     }
 
-    set LevelUp(amount){
+    LevelUp(amount){
         this.level += amount;
     }
 
-    set ExperienceGain(amount){
+    ExperienceGain(amount){
         this.experience += amount;
     }
 }
 
-
 function FindPlayer(data,name){
     for(var key in data){
-        console.log(data[key].name);
-        console.log(name);
         if(data[key].name == name){
-            console.log("Found player");
             return data[key];
         }
     }
@@ -49,3 +45,4 @@ function FindPlayer(data,name){
 
 module.exports.Player = Player;
 module.exports.FindPlayer = FindPlayer;
+module.exports.Instance = Instance;

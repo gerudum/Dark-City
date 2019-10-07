@@ -15,7 +15,7 @@ const prefix = "/";
 
 Listener.Listen();
 
-let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
+let data = JSON.parse(fs.readFileSync('.data/data.json','utf8'));
 let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
 
 setInterval(Update, 10000);
@@ -26,6 +26,7 @@ function Update(){
             var channel = bot.channels.get("596021725620207682");
             Listing.List(depot,listing,channel);
         }
+        
         if(listing.Ended()){
             var channel = bot.channels.get("596021725620207682");
             Listing.End(depot,listing,channel);
@@ -33,9 +34,6 @@ function Update(){
     }
 }
 
-function Reviver(key, value){
-    return new Player.Player(key);
-}
 
 bot.on('guildMemberAdd', member => {
     member.guild.channels.get('channelID').send("Welcome " + member.displayName); 
@@ -50,8 +48,10 @@ bot.on('message', message=> {
         return;
     } 
 
-    let data = JSON.parse('.data/data.json', Reviver);
-
+    for(var key in data){
+        var dude = data[key];
+        data[key] = new Player.Player(dude.name,dude.avatarURL,dude.points,dude.coins,dude.experience,dude.level,dude.collection);
+    }
 
     Log.LogChat(message);
 
@@ -64,7 +64,10 @@ bot.on('message', message=> {
         data[playerID] = newPlayer;
     }
 
-    let player = data[playerID];
+    //Reinstancing the player so we have access to the functions.
+    var getPlayer = data[playerID];
+    let player = new Player.Player(getPlayer.name,getPlayer.avatarURL,getPlayer.points,getPlayer.coins,
+        getPlayer.experience,getPlayer.level,getPlayer.collection);
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
@@ -77,8 +80,21 @@ bot.on('message', message=> {
     }  
     
     switch(args[0]){
+        case 'clear':
+            if(!message.member.roles.has(admin)){ return; }
+            data = {};
+        break;
         case 'list':
             if(!message.member.roles.has(admin)){ return; }
+            if(!args[4]) { return; }
+
+            try {
+                let listing = new Listing.Listing(args[1],parseInt(args[2]),parseInt(args[3]),parseInt(args[4]),message.channel.id);
+                depot[listing.name] = listing;
+            } catch (e){
+                message.reply("Invalid syntax: /list [name] [price] [startdate(minutes from now)] [enddate(minutes from now)]")
+            }
+        
         break;
 
         case 'stats':
@@ -128,9 +144,9 @@ bot.on('message', message=> {
 
                 try {
                     var person = Player.FindPlayer(data,args[1]);
-                    var amount = parseInt(args[2]);
-                    person.AddPoints(amount);
+                    var amount = parseFloat(args[2].toString());
 
+                    person.AddPoints(amount); 
                     message.reply(amount + " points Added to " + person.name); 
                 } catch(e) {
                     message.reply("Failed to give points, Syntax: /add [playerName] [points]");
