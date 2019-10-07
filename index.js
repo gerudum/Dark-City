@@ -21,13 +21,37 @@ setInterval(() => {
 }, 280000);
 
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
-
+let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
 
 let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
 let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
-let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
+let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8')); //Configuration for th shop
+let tree = JSON.parse(fs.readFileSync('configurations/tree.json','utf8')); //Configuration for leveling tree
 
 var conditions = require("./conditions.js");
+
+setInterval(function() {
+	Update();
+}, 10000);
+
+//Called every 10 seconds.
+function Update(){
+	//Checking if a listing is ready to start or ready to end.
+	for(var key in depot){
+		if(new Date() > depot[key].startDate){
+			var channel = bot.channels.get(depot[key].channel);
+			channel.send(depot[key].attachment).then( sentMessage => {
+				depot[key].id = sentMessage.id;
+			})
+		}
+		
+		if(new Date() > depot[key].endDate){
+			var channel = bot.channels.get(depot[key].channel);
+			var msg = channel.fetchMessage(depot[key].id);
+			msg.Delete();
+		}
+	}
+}
 
 //Saving Data, Make sure the json is good before saving it.
 function Validate(json){
@@ -41,10 +65,17 @@ function Validate(json){
         return false;
     }
 }
+
+//SaveData
 function SaveData(){
     //SaveData here
     if(Validate(data)){
         fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
+            if (err) console.error(err);
+        })
+    }
+	if(Validate(depot)){
+        fs.writeFile('.data/depot.json', JSON.stringify(depot,null,2), (err) =>{
             if (err) console.error(err);
         })
     }
@@ -98,6 +129,8 @@ function Raffle(){
     channel.send(raffle);
     
 }
+
+//Roll
 function Roll(loot, weights){
     var top = 0;
     var total = 0;
@@ -255,8 +288,13 @@ function InstancePlayer(player){
     data[player].weight = 0;
     data[player].points = 0;
     data[player].coins = 0;
+	data[player].experience = 0;
+	data[player].level = 0;
+	data[player].collection = new Date();
     console.log("New data");
 }
+
+//PlayerBase
 function PlayerBase(isAdmin = false){
     const players = new Discord.RichEmbed()
     players.setTitle("Current Playerbase")
@@ -306,6 +344,8 @@ async function Bank(icon,player,channel,rank){
 
     var coins = data[player].coins.toString();
     var points = data[player].points.toString();
+	var level = data[player].level.toString();
+	var income = tree[data[player].level].hourlyIncome.toString();
 
     ctx.font = "600 15px Arial";
 
@@ -334,7 +374,23 @@ async function Bank(icon,player,channel,rank){
     ctx.textAlign = "start";
     ctx.fillStyle = "#FCDB00";
     ctx.fillText("Tokens " + coins,60,175);
+	
+	//Level
+	ctx.textAlign = "start";
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Level " + level,60,225);
+    
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Level " + level,60,225);
 
+	//Income
+	ctx.textAlign = "start";
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Hourly Income " + income,60,275);
+    
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Hourly Income " + income,60,275);
+	
     //Rank
     ctx.textAlign = "center";
     ctx.strokeStyle = "black";
@@ -348,7 +404,7 @@ async function Bank(icon,player,channel,rank){
     channel.send(attachment); 
 }
 //Create Listing on the Glyph Shop
-async function CreateImage(image,name,price){
+async function CreateImage(image,name,price,startDate,endDate){
     var channel = bot.channels.get("596021725620207682");
 	const canvas = Canvas.createCanvas(250, 250);
     const ctx = canvas.getContext('2d');
@@ -404,12 +460,20 @@ async function CreateImage(image,name,price){
     ctx.font = "600 15px Arial"
     ctx.fillStyle = "#FFD9C4";
     ctx.textAlign = "center";
-    ctx.fillText("Ends Anytime!",125,235);
+	
+	var endingDate = OffsetDate(new Date(), endDate);
+    ctx.fillText("Ends " + endingDate.toLocaleDateString(),125,235);
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
-    channel.send(attachment);
+	depot[name].attachment = attachment;
+	depot[name].startDate = startDate;
+	depot[name].endDate = endDate;
+	depot[name].channel = channel.id;
+	
+    //channel.send(attachment);
 }
+
 function FixData(){
 // Get the Guild and store it under the variable "list"
 const list = bot.guilds.get("542118518842196010"); 
@@ -423,6 +487,8 @@ list.members.forEach(member => {
             data[member.user.id].coins = 0;
             data[member.user.id].weight = 0;
             data[member.user.id].points = 0;
+			data[member.user.id].experience = 0;
+			data[member.user.id].level = 0;
             console.log("New Data created");
         }
     }); 
@@ -440,44 +506,81 @@ function LogChat(msg){
     fs.appendFileSync('.data/chat.txt',today + " " + msg.author.username + " " + msg + " \n");
 }
 
-bot.on('ready', () => {
+function OffsetDate(init, offset){
+	var nextDate = new Date(init);
+	nextDate.setSeconds(init.getSeconds() + offset);
+	return nextDate;
+}
 
+function Collection(player, id){
+	const collection = new Discord.RichEmbed();
+	var total = 0;
+	
+	while(data[player].collection < new Date()){
+		data[player].points += tree[data[player].level].hourlyGain;
+		data[player].collection = OffsetDate(data[player].collection, 3600);
+		total += tree[data[player].level].hourlyGain;
+	}
+	
+	collection.setTitle(data[player].name + "'s Collection");
+	collection.addField("You've collected", total + " coins");
+	
+	var channel = bot.channels.get(id);
+    channel.send(collection);
+}
+
+function LevelUp(player){
+	data[player].level += 1;
+	data[player].gain = tree[data[player].level];
+}
+
+bot.on('ready', () => {
     console.log("Raring to go!");
 })
+
 bot.on('messageUpdate', message =>{
     SaveData();
 })
+
 bot.on('message', message=> {
     if(message.channel.type === "dm"){
+		message.channel.send("Commands in a Direct Message will not work.");
         return;
     } 
 
     let player = message.author.id;
-    
-    //Incase we need to clear data
-    if(!data){
-        data = {};
-    }
 
     LogChat(message);
+	
     //Instancing Player Data
-
     if(!data[player]){
         InstancePlayer(player);
         data[player].name = message.author.username;
         data[player].art = message.author.avatarURL;
         data[player].coins = 0;
     }
+	
+	//Experience is equal to the total amount of messages you have sent
+	data[player].experience += 1;
+	if(data[player].experience >= tree[data[player].level + 1].expRequired){
+		LevelUp(player);
+	}
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
+	
     //Admin Powers
     var admin;
     if(message.channel.type === "text"){
         admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
     }  
     
+	//Commands
     switch(args[0]){
+		//Collect your earnings
+		case 'collect':
+			Collection(player, message.channel.id);
+		break;
         //Check who has data
         case 'fix':
             if(admin){
@@ -506,6 +609,9 @@ bot.on('message', message=> {
                     case 'shop':
                         Log(message.channel,'configurations/shop.json');
                     break;
+					case 'tree':
+						Log(message.channel,'configurations/tree.json');
+					break;
                     case 'chat':
                         Log(message.channel,'.data/chat.txt');
                     break;
@@ -560,6 +666,7 @@ bot.on('message', message=> {
                 break;
             }
         break;
+			
        //Add Coins
         case 'addcoin':
                 if(!message.member.roles.has(admin)){
@@ -584,6 +691,7 @@ bot.on('message', message=> {
                 }        
             //message.delete();
         break;
+			
         //Add Points
         case 'add':
                 if(!message.member.roles.has(admin)){
@@ -627,11 +735,12 @@ bot.on('message', message=> {
         //Set a glyph deal
         case 'glyph':
             if(args.length < 3){
-                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price]")
+                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price] [startDate] [endDate]")
+				message.reply("Date is minutes into the future, set it to 0 for now.");
                 return;
             }
             try{
-                CreateImage(args[1],args[2],args[3].toString(),message.channel);
+                CreateImage(args[1],args[2],args[3].toString(), parseInt(args[4]), parseInt(args[5]));
                 message.delete();
             } catch(e){
                 console.log(e);
