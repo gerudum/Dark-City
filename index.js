@@ -59,7 +59,7 @@ function Update(){
 			channel.send(listing.attachment).then( sentMessage => {
 				listing.id = sentMessage.id;
 				
-				depot[key] = saveListing;
+				depot[key] = listing;
 			})
 		}
 		
