@@ -33,4 +33,5 @@ function SaveDepot(depot){
 }
 
 module.exports.SaveData = SaveData;
+module.exports.SaveDepot = SaveDepot;
 module.exports.Validate = Validate;

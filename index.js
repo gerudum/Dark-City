@@ -18,16 +18,27 @@ Listener.Listen();
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8'));
 let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
 
-setInterval(Update, 10000);
+setInterval(function() {
+    Update();
+}, 10000);
+
 function Update(){
+    console.log("Updating");
     for(var key in depot){
         var listing = depot[key];
-        if(listing.Ready()){
+    
+        listing.startDate = new Date(listing.startDate);
+        listing.endDate = new Date(listing.endDate);
+      
+        //console.log(listing.startDate);
+      
+        if(listing.startDate <= new Date()){
+            console.log("Listing Item");
             var channel = bot.channels.get("596021725620207682");
             Listing.List(depot,listing,channel);
         }
-        
-        if(listing.Ended()){
+
+        if(listing.endDate <= new Date()){
             var channel = bot.channels.get("596021725620207682");
             Listing.End(depot,listing,channel);
         }
@@ -48,9 +59,14 @@ bot.on('message', message=> {
         return;
     } 
 
+    //Reinstance everyone
     for(var key in data){
         var dude = data[key];
         data[key] = new Player.Player(dude.name,dude.avatarURL,dude.points,dude.coins,dude.experience,dude.level,dude.collection);
+    }
+    for(var key in depot){
+        var item = depot[key];
+        depot[key] = new Listing.Listing(item.name,item.price,item.startDate,item.endDate,item.id,item.channelID);
     }
 
     Log.LogChat(message);
@@ -65,9 +81,7 @@ bot.on('message', message=> {
     }
 
     //Reinstancing the player so we have access to the functions.
-    var getPlayer = data[playerID];
-    let player = new Player.Player(getPlayer.name,getPlayer.avatarURL,getPlayer.points,getPlayer.coins,
-        getPlayer.experience,getPlayer.level,getPlayer.collection);
+    let player = data[playerID];
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
@@ -83,27 +97,42 @@ bot.on('message', message=> {
         case 'clear':
             if(!message.member.roles.has(admin)){ return; }
             data = {};
+            depot = {};
         break;
         case 'list':
             if(!message.member.roles.has(admin)){ return; }
             if(!args[4]) { return; }
 
             try {
-                let listing = new Listing.Listing(args[1],parseInt(args[2]),parseInt(args[3]),parseInt(args[4]),message.channel.id);
+
+                var name = args[1];
+                var points = parseInt(args[2]);
+                var startDate = new Date();
+                var endDate = new Date();
+
+                startDate = Listing.Offset(parseInt(args[3]));
+                endDate = Listing.Offset(parseInt(args[4]));
+
+                let listing = new Listing.Listing(name,points,startDate,endDate,message.channel.id);
                 depot[listing.name] = listing;
+
+                message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);
             } catch (e){
-                message.reply("Invalid syntax: /list [name] [price] [startdate(minutes from now)] [enddate(minutes from now)]")
+                console.log(e);
+                message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]");
             }
         
         break;
 
         case 'stats':
             var embed = new Discord.RichEmbed();
+
             embed.setTitle(player.name + "'s Stats");
             embed.addField("Points",player.points);
             embed.addField("Coins",player.coins);
             embed.addField("Experience",player.experience);
             embed.addField("Level",player.level);
+
             message.channel.send(embed);
         break;
 
@@ -115,6 +144,9 @@ bot.on('message', message=> {
                     break;
                     case 'chat':
                         Log.Log(message.channel,'.data/chat.json');
+                    break;
+                    case 'depot':
+                        Log.Log(message.channel,'.data/depot.json');
                     break;
                 }
         break;
@@ -157,6 +189,7 @@ bot.on('message', message=> {
     
     //All Data we need to keep track of
     Save.SaveData(data);
+    Save.SaveDepot(depot);
 })
 
 bot.login(process.env.TOKEN);

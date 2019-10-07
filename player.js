@@ -45,4 +45,3 @@ function FindPlayer(data,name){
 
 module.exports.Player = Player;
 module.exports.FindPlayer = FindPlayer;
-module.exports.Instance = Instance;

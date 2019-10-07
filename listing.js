@@ -4,15 +4,17 @@ const Discord = require('discord.js');
 class Listing {
     constructor(name, price, startDate, endDate, id=0,channelID=0){
         this.id = id;
+        this.channelID = channelID;
         this.name = name;
         this.price = price;
-        this.startDate = GetDate(startDate);
-        this.endDate = GetDate(endDate);
+        this.startDate = new Date(startDate);
+        this.endDate = new Date(endDate);
     }
 
     GetDate(offset){
         var date = new Date();
-        date.setMinutes(date.getMinutes + offset);
+        date.setSeconds(date.getSeconds() + offset);
+
         return date;
     }
 
@@ -33,29 +35,41 @@ class Listing {
     }
 }
 
+
+function OffsetDate(offset){
+    var date = new Date();
+    date.setSeconds(date.getSeconds() + offset);
+
+    return date;
+}
+
 function ListItem(depot, listing, channel){
-    var embed = Discord.RichEmbed();
+  
+    var embed = new Discord.RichEmbed();
 
     //Put it out there!
-    embed.SetTitle("Depot Item");
-    embed.AddField("Price ", listing.price + " points")
-    embed.AddField("End Date ", listing.endDate.ToLocaleString())
+    embed.setTitle("Depot Item");
+    embed.addField("Price ", listing.price + " points")
+    embed.addField("End Date ", listing.endDate)
 
     channel.send(embed).then ( sentEmbed => {
         listing.id = sentEmbed.id;
     });
 
+    console.log(listing.id);
+    
     //So it doesn't start multiple times
-    listing.startDate = listing.OffsetDate(1000000);
+    listing.startDate = OffsetDate(10000000);
     depot[listing.name] = listing;
 
     Save.SaveDepot(depot);
 }
 
 function EndItem(depot, listing, channel){
-    var msg = channel.fetchMessage(listing.id);
+    channel.fetchMessage(listing.id).then (foundMessage => {
+        foundMessage.delete();
+    });
 
-    msg.Delete();
     depot[listing.name] = {};
 
     Save.SaveDepot(depot);
@@ -64,3 +78,4 @@ function EndItem(depot, listing, channel){
 module.exports.Listing = Listing;
 module.exports.List = ListItem;
 module.exports.End = EndItem;
+module.exports.Offset = OffsetDate;
