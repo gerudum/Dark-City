@@ -12,11 +12,21 @@ function Validate(json){
         return false;
     }
 }
+
 //SaveData
-function SaveData(){
+function SaveData(data){
     //SaveData here
     if(Validate(data)){
         fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
+            if (err) console.error(err);
+        })
+    }  
+}
+
+//Save Depot
+function SaveDepot(depot){
+    if(Validate(depot)){
+        fs.writeFile('.data/depot.json', JSON.stringify(depot,null,2), (err) =>{
             if (err) console.error(err);
         })
     }

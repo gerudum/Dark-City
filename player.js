@@ -25,6 +25,23 @@ class Player {
             this.coins = 0;
         }
     }
+
+    set LevelUp(amount){
+        this.level += amount;
+    }
+
+    set ExperienceGain(amount){
+        this.experience += amount;
+    }
+}
+
+function FindPlayer(data,name){
+    for(var key in data){
+        if(data[key].name == name){
+            return data[key];
+        }
+    }
 }
 
 module.exports.Player = Player;
+module.exports.FindPlayer = FindPlayer;

@@ -1,8 +1,11 @@
+const Save = require('./save.js');
+const Discord = require('discord.js');
+
 class Listing {
-    constructor(name, image, startDate, endDate, id=0){
+    constructor(name, price, startDate, endDate, id=0){
         this.id = id;
         this.name = name;
-        this.image = image;
+        this.price = price;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -24,4 +27,31 @@ class Listing {
     }
 }
 
+function ListItem(depot, listing, channel){
+    var embed = Discord.RichEmbed();
+
+    embed.SetTitle("Depot Item");
+    embed.AddField("Price ", listing.price + " points")
+    embed.AddField("End Date ", listing.endDate.ToLocaleString())
+
+    channel.send(embed).then ( sentEmbed => {
+        listing.id = sentEmbed.id;
+    });
+
+    depot[listing.name] = listing;
+
+    Save.SaveDepot(depot);
+}
+
+function EndItem(depot, listing, channel){
+    var msg = channel.fetchMessage(listing.id);
+
+    msg.Delete();
+    depot[listing.name] = {};
+
+    Save.SaveDepot(depot);
+}
+
 module.exports.Listing = Listing;
+module.exports.List = ListItem;
+module.exports.End = EndItem;

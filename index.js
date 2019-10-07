@@ -7,6 +7,7 @@ const Casino = require('./casino.js');
 const Listing = require('./listing.js');
 const Log = require('./log.js');
 const Save = require('./save.js');
+
 const Listener = require('./listener.js');
 
 const fs = require('fs');
@@ -17,13 +18,27 @@ Listener.Listen();
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
 let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
 
+setInterval(Update, 10000);
+function Update(){
+    for(var key in depot){
+        var listing = depot[key];
+        if(listing.Ready()){
+            var channel = bot.channels.get("596021725620207682");
+            Listing.List(depot,listing,channel);
+        }
+        if(listing.Ended()){
+            var channel = bot.channels.get("596021725620207682");
+            Listing.End(depot,listing,channel);
+        }
+    }
+}
+
+bot.on('guildMemberAdd', member => {
+    member.guild.channels.get('channelID').send("Welcome " + member.displayName); 
+});
+
 bot.on('ready', () => {
-
     console.log("Raring to go!");
-})
-
-bot.on('messageUpdate', message =>{
-    SaveData();
 })
 
 bot.on('message', message=> {
@@ -31,11 +46,11 @@ bot.on('message', message=> {
         return;
     } 
 
-    let playerID = message.author.id;
-    
-
     Log.LogChat(message);
 
+    //Player ID
+    let playerID = message.author.id;
+    
     //Instancing Player Data
     if(!data[playerID]){
         var newPlayer = new Player.Player(message.author.username,message.author.avatarURL);
@@ -55,62 +70,70 @@ bot.on('message', message=> {
     }  
     
     switch(args[0]){
+        case 'list':
+            if(!message.member.roles.has(admin)){ return; }
+        break;
+
+        case 'stats':
+            var embed = new Discord.RichEmbed();
+            embed.setTitle(player.name + "'s Stats");
+            embed.addField("Points",player.points);
+            embed.addField("Coins",player.coins);
+            embed.addField("Experience",player.experience);
+            embed.addField("Level",player.level);
+            message.channel.send(embed);
+        break;
+
         case 'log':
-            if(admin){
+            if(!message.member.roles.has(admin)){ return; }
                 switch (args[1]) {
                     case 'data':
                         Log.Log(message.channel,'.data/data.json');
                     break;
+                    case 'chat':
+                        Log.Log(message.channel,'.data/chat.json');
+                    break;
                 }
-            }  
         break;
+
        //Add Coins
         case 'addcoin':
-                if(!message.member.roles.has(admin)){
-                    message.author.send("You do not have the necessary roles.");
-                    return;
-                }
-                if(!args[1]){
-                    message.author.send("Please specify someone to add points to.");
-                    return;
-                }  
-                var person = data[args[0]];
-                var amount = parseFloat(args[args.length - 1].toString());
-                
-                try {
-                    person.AddCoins(amount);
+                if(!message.member.roles.has(admin)){ return; }
+
+                try {           
+                    var person = Player.FindPlayer(args[0]);
+                    var amount = parseFloat(args[args.length - 1].toString());
+
+                    person.AddCoins(amount);      
+                    message.reply(amount + " coins Added to " + person.name);
                 } catch(e) {
-                    console.log("Failed to give points, Syntax: /add [player] [points]");
+                    message.reply("Failed to give points, Syntax: /add [playerName] [points]");
+                    console.log(person.name + " " + amount);
                 }
-                
-                message.author.send(amount + " coins Added to " + data[key].name);
         break;
+
         //Add Points
         case 'add':
                 if(!message.member.roles.has(admin)){
-                    message.author.send("You do not have the necessary roles.");
+                    message.author.send("You do not have the necessary role(s).");
                     return;
                 }
-                if(!args[1]){
-                    message.author.send("Please specify someone to add points to.");
-                    return;
-                }  
-
-                var person = data[args[0]];
-                var amount = parseFloat(args[args.length - 1].toString());
 
                 try {
-                    person.AddPoints(key,amount);
-                } catch(e) {
-                    console.log("Failed to give points, Syntax: /add [player] [points]");
-                }
+                    var person = data[args[0]];
+                    var amount = parseFloat(args[args.length - 1].toString());
+                    person.AddPoints(amount);
 
-                message.author.send(amount + " points Added to " + data[key].name);     
+                    message.reply(amount + " points Added to " + person.name); 
+                } catch(e) {
+                    message.reply("Failed to give points, Syntax: /add [playerName] [points]");
+                    console.log(person.name + " " + amount);
+                }  
         break;      
     }  
     
     //All Data we need to keep track of
-    SaveData();
+    Save.SaveData(data);
 })
 
 bot.login(process.env.TOKEN);
