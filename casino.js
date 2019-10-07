@@ -1,4 +1,4 @@
-export default class Table {
+class Table {
     constructor(entries){
         this.entries = entries;
     }
@@ -25,7 +25,7 @@ export default class Table {
         return null;
     }
 }
-export default class Entry{
+class Entry{
     constructor(result, weight = 5){
         this.result = result;
         this.weight = weight;

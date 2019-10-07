@@ -1,4 +1,4 @@
-export default class Listing {
+class Listing {
     constructor(name, image, startDate, endDate, id=0){
         this.id = id;
         this.name = name;

@@ -1,4 +1,4 @@
-export default class Player {
+class Player {
     //Create a New Player
     constructor(name,avatar,points = 0, coins = 0, experience = 0, level = 0, collection = new Date()){
         this.name = name;
