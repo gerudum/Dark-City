@@ -1,31 +1,21 @@
-//Classes
-import Player from './player';
-import Listing from './listing';
-import Roll from './casino';
+//Imports
+import Player from '/player';
+import Listing from '/listing';
+import Table from '/casino';
+import Entry from '/casino';
 
-//Discord
 const Discord = require('discord.js');
 
-//Image Creation
+//Imaging
 const Canvas = require('canvas');
 
-//Bot
 const bot = new Discord.Client();
-
-//So the bot  can stay up forever
 const http = require('http');
 const express = require('express');
 const app = express();
-
-//For saving and loading data
 const fs = require('fs');
-
-//Prefix for comands
 const prefix = "/";
 
-
-
-//Listening for pings, this keeps the bot up.
 app.get("/", (request, response) => {
   console.log(Date.now() + " Ping Received");
   response.sendStatus(200);
@@ -36,43 +26,10 @@ setInterval(() => {
 }, 280000);
 
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
-let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8')); //Depot Data
 
 let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
 let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
-let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8')); //Configuration for th shop
-let tree = JSON.parse(fs.readFileSync('configurations/tree.json','utf8')); //Configuration for leveling tree
-
-var conditions = require("./conditions.js");
-
-setInterval(function() {
-	Update();
-}, 10000);
-
-//Called every 10 seconds.
-function Update(){
-	//Checking if a listing is ready to start or ready to end.
-	for(var key in depot){
-		var listing = depot[key];
-		
-		//Is it time for this listing to start?
-		if(new Date() >= listing.startDate){
-			var channel = bot.channels.get(listing.channel);
-			
-			channel.send(listing.attachment).then( sentMessage => {
-				listing.id = sentMessage.id;
-				
-				depot[key] = listing;
-			})
-		}
-		
-		if(new Date() >= listing.endDate){
-			var channel = bot.channels.get(listing.channel);
-			var msg = channel.fetchMessage(listing.id);
-			msg.Delete();
-		}
-	}
-}
+let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
 
 //Saving Data, Make sure the json is good before saving it.
 function Validate(json){
@@ -86,17 +43,10 @@ function Validate(json){
         return false;
     }
 }
-
-//SaveData
 function SaveData(){
     //SaveData here
     if(Validate(data)){
         fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
-            if (err) console.error(err);
-        })
-    }
-	if(Validate(depot)){
-        fs.writeFile('.data/depot.json', JSON.stringify(depot,null,2), (err) =>{
             if (err) console.error(err);
         })
     }
@@ -119,12 +69,11 @@ function CreateAnnouncement(announcement,id = 0){
             id = "596021725620207682";
         break;
     }
-	
-    const news = new Discord.RichEmbed();
-    news.setTitle("Important Announcement");
-    news.addField("News", announcement);
-    news.setFooter("Read all about it!");
-    news.setThumbnail(manage.announcement);
+    const news = new Discord.RichEmbed()
+    news.setTitle("Important Announcement")
+    news.addField("News", announcement)
+    news.setFooter("Read all about it!")
+    news.setThumbnail(manage.announcement)
     var channel = bot.channels.get(id);
     channel.send(news);
 }
@@ -152,23 +101,6 @@ function Raffle(){
     
 }
 
-//Find Player
-function FindPlayer(args){
-    var person = "";
-    for (var i = 1; i < args.length; i++) {
-        if(data[person]){
-                break;
-        }
-        if(args[i + 1] != args[args.length]){
-                person += args[i].toString();
-        }
-        if (args[i + 1] != null && args[i + 1] != args[args.length - 1]) {
-                person += " ";
-        }
-    }
-    return person;
-}
-
 //Spawn Table
 function Spawn(drop_table){
     var top = 0;
@@ -194,19 +126,7 @@ function Spawn(drop_table){
     }   
 }
 
-//Addpoints to the player
-function AddPoints(player,amount){
-    player.points += amount;
-    if(player.points <= 0){
-        player.points = 0;
-    }
-}
-function AddCoins(player,amount){
-    player.coins += amount;
-    if(player.coins <= 0){
-        player.coins = 0;
-    }
-}
+
 
 //Roll the Slots
 var limit = 10;
@@ -237,6 +157,7 @@ function Slots(player,amount,channel){
 
     }
 }
+
 async function Slots_Result(player,result,amount,channel){
     const canvas = Canvas.createCanvas(400, 100 + (amount * 80));
     const ctx = canvas.getContext('2d');
@@ -289,7 +210,6 @@ async function Slots_Result(player,result,amount,channel){
     channel.send(attachment);
 }
 
-//PlayerBase
 function PlayerBase(isAdmin = false){
     const players = new Discord.RichEmbed()
     players.setTitle("Current Playerbase")
@@ -339,8 +259,6 @@ async function Bank(icon,player,channel,rank){
 
     var coins = player.coins.toString();
     var points = player.points.toString();
-	var level = player.level.toString();
-	var income = tree[player.level].hourlyIncome.toString();
 
     ctx.font = "600 15px Arial";
 
@@ -369,23 +287,7 @@ async function Bank(icon,player,channel,rank){
     ctx.textAlign = "start";
     ctx.fillStyle = "#FCDB00";
     ctx.fillText("Tokens " + coins,60,175);
-	
-	//Level
-	ctx.textAlign = "start";
-    ctx.strokeStyle = "black";
-    ctx.strokeText("Level " + level,60,225);
-    
-    ctx.fillStyle = "#FCDB00";
-    ctx.fillText("Level " + level,60,225);
 
-	//Income
-	ctx.textAlign = "start";
-    ctx.strokeStyle = "black";
-    ctx.strokeText("Hourly Income " + income,60,275);
-    
-    ctx.fillStyle = "#FCDB00";
-    ctx.fillText("Hourly Income " + income,60,275);
-	
     //Rank
     ctx.textAlign = "center";
     ctx.strokeStyle = "black";
@@ -399,9 +301,9 @@ async function Bank(icon,player,channel,rank){
     channel.send(attachment); 
 }
 //Create Listing on the Glyph Shop
-async function CreateImage(image,name,price,startDate,endDate){
+async function CreateImage(image,name,price){
     var channel = bot.channels.get("596021725620207682");
-    const canvas = Canvas.createCanvas(250, 250);
+	const canvas = Canvas.createCanvas(250, 250);
     const ctx = canvas.getContext('2d');
     
     var newName = name.split("_");
@@ -455,38 +357,13 @@ async function CreateImage(image,name,price,startDate,endDate){
     ctx.font = "600 15px Arial"
     ctx.fillStyle = "#FFD9C4";
     ctx.textAlign = "center";
-	
-	var endingDate = OffsetDate(new Date(), endDate);
-    ctx.fillText("Ends " + endingDate.toLocaleDateString(),125,235);
+    ctx.fillText("Ends Anytime!",125,235);
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
-	var newListing = new Listing(0,name,price,attachment,startDate,endDate);
-	
-	depot[name] = saveListing;
-	
-    //channel.send(attachment);
+    channel.send(attachment);
 }
 
-function FixData(){
-// Get the Guild and store it under the variable "list"
-const list = bot.guilds.get("542118518842196010"); 
-
-// Iterate through the collection of GuildMembers from the Guild getting the username property of each member 
-list.members.forEach(member => {
-    if(!data[member.user.id]){
-            data[member.user.id] = {};
-            data[member.user.id].name = member.user.username;
-            data[member.user.id].art = member.user.avatarURL;
-            data[member.user.id].coins = 0;
-            data[member.user.id].weight = 0;
-            data[member.user.id].points = 0;
-			data[member.user.id].experience = 0;
-			data[member.user.id].level = 0;
-            console.log("New Data created");
-        }
-    }); 
-}
 //Get the JSONs currently on disk
 function Log(channel,json){
     const attachment = new Discord.Attachment(json);
@@ -501,86 +378,40 @@ function LogChat(msg){
     fs.appendFileSync('.data/chat.txt',today + " " + msg.author.username + " " + msg + " \n");
 }
 
-function OffsetDate(init, offset){
-	var nextDate = new Date(init);
-	nextDate.setSeconds(init.getSeconds() + offset);
-	return nextDate;
-}
-
-function Collection(player, id){
-	const collection = new Discord.RichEmbed();
-	var total = 0;
-	
-	while(player.collection < new Date()){
-		player.points += tree[player.level].hourlyGain;
-		player.collection = OffsetDate(player.collection, 3600);
-		total += tree[player.level].hourlyGain;
-	}
-	
-	collection.setTitle(player.name + "'s Collection");
-	collection.addField("You've collected", total + " coins");
-	
-	var channel = bot.channels.get(id);
-    channel.send(collection);
-}
-
-function LevelUp(player){
-	player.level += 1;
-	player.gain = tree[player.level];
-}
-
 bot.on('ready', () => {
+
     console.log("Raring to go!");
 })
-
 bot.on('messageUpdate', message =>{
     SaveData();
 })
-
 bot.on('message', message=> {
     if(message.channel.type === "dm"){
-		message.channel.send("Commands in a Direct Message will not work.");
         return;
     } 
-	
+
+    let playerID = message.author.id;
+    
 
     LogChat(message);
-	
+
     //Instancing Player Data
-    if(!data[message.author.id]){
-        var newPlayer = new Player(message.author.id,message.author.username,message.author.avatarUrl);
-	data[message.author.id] = savePlayer;
-    }
-	
-    var player = Jdata[message.author.id];
-	
-    //Experience is equal to the total amount of messages you have sent
-    player.experience += 1;
-    if(player.experience >= tree[player.level + 1].expRequired){
-	LevelUp(player);
+
+    if(!data[playerID]){
+        var newPlayer = new Player(message.author.username,message.author.avatarURL);
+        data[playerID] = newPlayer;
     }
 
+    let player = data[playerID];
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
-	
     //Admin Powers
     var admin;
     if(message.channel.type === "text"){
         admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
     }  
     
-	//Commands
     switch(args[0]){
-		//Collect your earnings
-		case 'collect':
-			Collection(player, message.channel.id);
-		break;
-        //Check who has data
-        case 'fix':
-            if(admin){
-                FixData();
-            }
-        break;
         case 'player':
             if(admin){
                 var play = PlayerBase(admin);
@@ -603,9 +434,6 @@ bot.on('message', message=> {
                     case 'shop':
                         Log(message.channel,'configurations/shop.json');
                     break;
-					case 'tree':
-						Log(message.channel,'configurations/tree.json');
-					break;
                     case 'chat':
                         Log(message.channel,'.data/chat.txt');
                     break;
@@ -660,7 +488,6 @@ bot.on('message', message=> {
                 break;
             }
         break;
-			
        //Add Coins
         case 'addcoin':
                 if(!message.member.roles.has(admin)){
@@ -671,21 +498,17 @@ bot.on('message', message=> {
                     message.author.send("Please specify someone to add points to.");
                     return;
                 }  
-                var person = FindPlayer(args);
+                var person = data[args[0]];
                 var amount = parseFloat(args[args.length - 1].toString());
-                for (var key in data){
-                    if(data[key].name === person){
-                        try {
-                            AddCoins(key,amount);
-                        } catch(e) {
-                            console.log("Failed to give points, Syntax: /add [player] [points]");
-                        }
-                        message.author.send(amount + " coins Added to " + data[key].name);
-                    } 
-                }        
-            //message.delete();
+                
+                try {
+                    person.AddCoins(amount);
+                } catch(e) {
+                    console.log("Failed to give points, Syntax: /add [player] [points]");
+                }
+                
+                message.author.send(amount + " coins Added to " + data[key].name);
         break;
-			
         //Add Points
         case 'add':
                 if(!message.member.roles.has(admin)){
@@ -696,19 +519,16 @@ bot.on('message', message=> {
                     message.author.send("Please specify someone to add points to.");
                     return;
                 }  
-                var person = FindPlayer(args);
+                var person = data[args[0]];
                 var amount = parseFloat(args[args.length - 1].toString());
-                for (var key in data){
-                    if(data[key].name === person){
-                        try {
-                            AddPoints(key,amount);
-                        } catch(e) {
-                            console.log("Failed to give points, Syntax: /add [player] [points]");
-                        }
-                        message.author.send(amount + " points Added to " + data[key].name);
-                    } 
-                }        
-            //message.delete();
+
+                try {
+                    person.AddPoints(key,amount);
+                } catch(e) {
+                    console.log("Failed to give points, Syntax: /add [player] [points]");
+                }
+
+                message.author.send(amount + " points Added to " + data[key].name);     
         break;
 
         //Check your points
@@ -729,12 +549,11 @@ bot.on('message', message=> {
         //Set a glyph deal
         case 'glyph':
             if(args.length < 3){
-                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price] [startDate] [endDate]")
-				message.reply("Date is minutes into the future, set it to 0 for now.");
+                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price]")
                 return;
             }
             try{
-                CreateImage(args[1],args[2],args[3].toString(), parseInt(args[4]), parseInt(args[5]));
+                CreateImage(args[1],args[2],args[3].toString(),message.channel);
                 message.delete();
             } catch(e){
                 console.log(e);
@@ -771,14 +590,16 @@ bot.on('message', message=> {
             message.author.send("Please specify someone to raffle.");
             return;
             }  
-            var person = FindPlayer(args);
+            person = data[args[0]];
             var amount = parseInt(args[args.length - 1].toString());
+
             for (var key in data){
-                if(data[key].name === person){
+                if(data[key].name === person.name){
                     data[key].weight += amount;
                     message.author.send("Entries Added");
                 } 
-            }    
+            }   
+             
             //message.delete();
         break;
 
