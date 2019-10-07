@@ -1,3 +1,8 @@
+//Classes
+import Player from './player';
+import Listing from './listing';
+import Roll from './casino';
+
 //Discord
 const Discord = require('discord.js');
 
@@ -18,9 +23,7 @@ const fs = require('fs');
 //Prefix for comands
 const prefix = "/";
 
-//Classes
-import Player from './player';
-import Listing from './listing';
+
 
 //Listening for pings, this keeps the bot up.
 app.get("/", (request, response) => {
@@ -147,22 +150,6 @@ function Raffle(){
     var channel = bot.channels.get("574793843963199506");
     channel.send(raffle);
     
-}
-
-//Roll
-function Roll(loot, weights){
-    var top = 0;
-    var total = 0;
-    for(var j = 0; j < weights.length; j++){
-        total+=weights[j];
-    }
-    var rand = Math.floor(Math.random() * total);
-    for(var i = 0; i < loot.length; i++){
-        top+=weights[i]; 
-        if(rand <= top){ 
-            return loot[i];                         
-        }                 
-    }   
 }
 
 //Find Player
