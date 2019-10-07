@@ -1,77 +1,31 @@
-//Imports
+const Discord = require('discord.js');
+const bot = new Discord.Client();
+
+//Requires
 const Player = require('./player.js');
 const Casino = require('./casino.js');
 const Listing = require('./listing.js');
+const Log = require('./log.js');
+const Save = require('./save.js');
+const Listener = require('./listener.js');
 
-const Discord = require('discord.js');
-
-//Imaging
-const Canvas = require('canvas');
-
-const bot = new Discord.Client();
-const http = require('http');
-const express = require('express');
-const app = express();
 const fs = require('fs');
 const prefix = "/";
 
-app.get("/", (request, response) => {
-  console.log(Date.now() + " Ping Received");
-  response.sendStatus(200);
-});
-app.listen(process.env.PORT);
-setInterval(() => {
-  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
-}, 280000);
+Listener.Listen();
 
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
 let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
-
-//Saving Data, Make sure the json is good before saving it.
-function Validate(json){
-    try {
-        var save = JSON.stringify(json);
-        var load = JSON.parse(save);
-        return true;
-    } catch (e){
-        console.log("Invalid Data, will not save");
-        console.log(e);
-        return false;
-    }
-}
-
-//SaveData
-function SaveData(){
-    //SaveData here
-    if(Validate(data)){
-        fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
-            if (err) console.error(err);
-        })
-    }
-}
-
-
-//Get the JSONs currently on disk
-function Log(channel,json){
-    const attachment = new Discord.Attachment(json);
-    channel.send(attachment);
-}
-
-function LogChat(msg){
-    console.log("Logging");
-    var date = new Date();
-    date.get
-    var today = date.getFullYear() + "/" + date.getMonth() + "/" + date.getDate() + " Time: " + date.getHours() + "/"  + date.getMinutes() + "/" + date.getSeconds();
-    fs.appendFileSync('.data/chat.txt',today + " " + msg.author.username + " " + msg + " \n");
-}
 
 bot.on('ready', () => {
 
     console.log("Raring to go!");
 })
+
 bot.on('messageUpdate', message =>{
     SaveData();
 })
+
 bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
@@ -80,7 +34,7 @@ bot.on('message', message=> {
     let playerID = message.author.id;
     
 
-    LogChat(message);
+    Log.LogChat(message);
 
     //Instancing Player Data
     if(!data[playerID]){
@@ -105,7 +59,7 @@ bot.on('message', message=> {
             if(admin){
                 switch (args[1]) {
                     case 'data':
-                        Log(message.channel,'.data/data.json');
+                        Log.Log(message.channel,'.data/data.json');
                     break;
                 }
             }  

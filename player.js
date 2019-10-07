@@ -25,5 +25,6 @@ class Player {
             this.coins = 0;
         }
     }
-
 }
+
+module.exports.Player = Player;

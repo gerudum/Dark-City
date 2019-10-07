@@ -31,3 +31,6 @@ class Entry{
         this.weight = weight;
     }
 }
+
+module.exports.Table = Table;
+module.exports.Entry = Entry;
