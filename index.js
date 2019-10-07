@@ -50,7 +50,7 @@ class Player {
 }
 
 class DepotListing {
-	constructor(id, name, price, attachment, startDate, endDate){
+	constructor(id = 0, name, price, attachment, startDate, endDate){
 		this.id = id;
 		this.name = name;
 		this.price = price;
@@ -482,10 +482,10 @@ async function CreateImage(image,name,price,startDate,endDate){
 
 	// Use helpful Attachment class structure to process the file for you
 	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
-	depot[name].attachment = attachment;
-	depot[name].startDate = startDate;
-	depot[name].endDate = endDate;
-	depot[name].channel = channel.id;
+	var newListing = new DepotListing(0,name,price,attachment,startDate,endDate);
+	var saveListing = JSON.stringify(newListing);
+	
+	depot[name] = saveListing;
 	
     //channel.send(attachment);
 }
