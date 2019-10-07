@@ -599,7 +599,7 @@ bot.on('message', message=> {
                     message.author.send("Entries Added");
                 } 
             }   
-             
+
             //message.delete();
         break;
 

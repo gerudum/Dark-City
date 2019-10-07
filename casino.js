@@ -1,4 +1,4 @@
-export class Table {
+export default class Table {
     constructor(entries){
         this.entries = entries;
     }
@@ -12,7 +12,7 @@ export class Table {
         }
 
         var rand = Math.floor(Math.random() * total);
-        
+
         for(var i = 0; i < this.entries.length; i++){
             top+=this.entries[i].weight; 
 
@@ -25,7 +25,7 @@ export class Table {
         return null;
     }
 }
-export class Entry{
+export default class Entry{
     constructor(result, weight = 5){
         this.result = result;
         this.weight = weight;
