@@ -1,4 +1,4 @@
-export default class DepotListing {
+export default class Listing {
 	constructor(id = 0, name, price, attachment, startDate, endDate){
 		this.id = id;
 		this.name = name;
