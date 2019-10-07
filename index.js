@@ -40,6 +40,7 @@ function Update(){
 
         if(listing.endDate <= new Date()){
             var channel = bot.channels.get("596021725620207682");
+            console.log(listing.id);
             Listing.End(depot,listing,channel);
         }
     }

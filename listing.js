@@ -56,8 +56,6 @@ function ListItem(depot, listing, channel){
         listing.id = sentEmbed.id;
     });
 
-    console.log(listing.id);
-    
     //So it doesn't start multiple times
     listing.startDate = OffsetDate(10000000);
     depot[listing.name] = listing;
@@ -65,10 +63,12 @@ function ListItem(depot, listing, channel){
     Save.SaveDepot(depot);
 }
 
-function EndItem(depot, listing, channel){
-    channel.fetchMessage(listing.id).then (foundMessage => {
-        foundMessage.delete();
-    });
+async function EndItem(depot, listing, channel){
+    console.log(listing.id);
+
+    channel.fetchMessage(listing.id).then ( async function (message) {
+        message.delete();
+    })
 
     depot[listing.name] = {};
 
