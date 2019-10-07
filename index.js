@@ -34,6 +34,32 @@ setInterval(function() {
 	Update();
 }, 10000);
 
+class Player {
+	construcor(id,name,art,level = 0, experience = 0, coins = 0, points = 0, weight = 0, gain = 0, collection = new Date()){
+		this.id = id;
+		this.name = name;
+		this.art =art;
+		this.level = level;
+		this.experience = experience;
+		this.coins = coins;
+		this.points = points;
+		this.weight = weight;
+		this.gain = gain;
+		this.collection = collection;
+	}
+}
+
+class DepotListing {
+	constructor(id, name, price, attachment, startDate, endDate){
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.attachment = attachment;
+		this.startDate = startDate;
+		this.endDate = endDate;
+	}
+}
+
 //Called every 10 seconds.
 function Update(){
 	//Checking if a listing is ready to start or ready to end.
@@ -98,11 +124,12 @@ function CreateAnnouncement(announcement,id = 0){
             id = "596021725620207682";
         break;
     }
-    const news = new Discord.RichEmbed()
-    news.setTitle("Important Announcement")
-    news.addField("News", announcement)
-    news.setFooter("Read all about it!")
-    news.setThumbnail(manage.announcement)
+	
+    const news = new Discord.RichEmbed();
+    news.setTitle("Important Announcement");
+    news.addField("News", announcement);
+    news.setFooter("Read all about it!");
+    news.setThumbnail(manage.announcement);
     var channel = bot.channels.get(id);
     channel.send(news);
 }
@@ -190,15 +217,15 @@ function Spawn(drop_table){
 
 //Addpoints to the player
 function AddPoints(player,amount){
-    data[player].points += amount;
-    if(data[player].points <= 0){
-        data[player].points = 0;
+    player.points += amount;
+    if(player.points <= 0){
+        player.points = 0;
     }
 }
 function AddCoins(player,amount){
-    data[player].coins += amount;
-    if(data[player].coins <= 0){
-        data[player].coins = 0;
+    player.coins += amount;
+    if(player.coins <= 0){
+        player.coins = 0;
     }
 }
 
@@ -206,10 +233,10 @@ function AddCoins(player,amount){
 var limit = 10;
 function Slots(player,amount,channel){
     const embed = new Discord.RichEmbed();
-    embed.setTitle(data[player].name + " is Spinning Slots!")
-    embed.setThumbnail(data[player].art);
+    embed.setTitle(player.name + " is Spinning Slots!")
+    embed.setThumbnail(player.art);
   
-    if(conditions.GreaterThan(data[player].coins,amount)){
+    if(conditions.GreaterThan(player.coins,amount)){
         //Points Configuration and Set up Result
         var points = spawn_table["POINTS"];
         var result = {};
@@ -247,10 +274,10 @@ async function Slots_Result(player,result,amount,channel){
 
     ctx.textAlign = "center";
     ctx.strokeStyle = "black";
-    ctx.strokeText(data[player].name + "'s Results",200,50);
+    ctx.strokeText(player.name + "'s Results",200,50);
 
     ctx.fillStyle = "#FCDB00";
-    ctx.fillText(data[player].name + "'s Results",200,50);
+    ctx.fillText(player.name + "'s Results",200,50);
 
     var offset = 60;
     var distance = 70;
@@ -276,22 +303,11 @@ async function Slots_Result(player,result,amount,channel){
     ctx.drawImage(tokens, 24, canvas.height - 60,40,40);
 
     ctx.font = "600 20px Arial";
-    ctx.fillText(data[player].coins, offset + 40, canvas.height - 5);
+    ctx.fillText(player.coins, offset + 40, canvas.height - 5);
 
     const attachment = new Discord.Attachment(canvas.toBuffer(), 'slots.png');
 
     channel.send(attachment);
-}
-
-function InstancePlayer(player){
-    data[player] = {};
-    data[player].weight = 0;
-    data[player].points = 0;
-    data[player].coins = 0;
-	data[player].experience = 0;
-	data[player].level = 0;
-	data[player].collection = new Date();
-    console.log("New data");
 }
 
 //PlayerBase
@@ -342,17 +358,17 @@ async function Bank(icon,player,channel,rank){
     ctx.drawImage(fiend_icon, 15, 15, 60, 60);
     ctx.drawImage(border,0,0,canvas.width,canvas.height);
 
-    var coins = data[player].coins.toString();
-    var points = data[player].points.toString();
-	var level = data[player].level.toString();
-	var income = tree[data[player].level].hourlyIncome.toString();
+    var coins = player.coins.toString();
+    var points = player.points.toString();
+	var level = player.level.toString();
+	var income = tree[player.level].hourlyIncome.toString();
 
     ctx.font = "600 15px Arial";
 
     //Name
     ctx.textAlign = "center";
     ctx.fillStyle = "#FCDB00";
-    ctx.fillText(data[player].name,325,25);
+    ctx.fillText(player.name,325,25);
 
     ctx.font = "600 20px Arial";
 
@@ -516,13 +532,13 @@ function Collection(player, id){
 	const collection = new Discord.RichEmbed();
 	var total = 0;
 	
-	while(data[player].collection < new Date()){
-		data[player].points += tree[data[player].level].hourlyGain;
-		data[player].collection = OffsetDate(data[player].collection, 3600);
-		total += tree[data[player].level].hourlyGain;
+	while(player.collection < new Date()){
+		player.points += tree[player.level].hourlyGain;
+		player.collection = OffsetDate(player.collection, 3600);
+		total += tree[player.level].hourlyGain;
 	}
 	
-	collection.setTitle(data[player].name + "'s Collection");
+	collection.setTitle(player.name + "'s Collection");
 	collection.addField("You've collected", total + " coins");
 	
 	var channel = bot.channels.get(id);
@@ -530,8 +546,8 @@ function Collection(player, id){
 }
 
 function LevelUp(player){
-	data[player].level += 1;
-	data[player].gain = tree[data[player].level];
+	player.level += 1;
+	player.gain = tree[player.level];
 }
 
 bot.on('ready', () => {
@@ -547,22 +563,22 @@ bot.on('message', message=> {
 		message.channel.send("Commands in a Direct Message will not work.");
         return;
     } 
-
-    let player = message.author.id;
+	
 
     LogChat(message);
 	
     //Instancing Player Data
-    if(!data[player]){
-        InstancePlayer(player);
-        data[player].name = message.author.username;
-        data[player].art = message.author.avatarURL;
-        data[player].coins = 0;
+    if(!data[message.author.id]){
+        var newPlayer = new Player(message.author.id,message.author.username,message.author.avatarUrl);
+		var savePlayer = JSON.stringify(newPlayer);
+		data[message.author.id] = savePlayer;
     }
 	
+	var player = JSON.parse(data[message.author.id]);
+	
 	//Experience is equal to the total amount of messages you have sent
-	data[player].experience += 1;
-	if(data[player].experience >= tree[data[player].level + 1].expRequired){
+	player.experience += 1;
+	if(player.experience >= tree[player.level + 1].expRequired){
 		LevelUp(player);
 	}
 
