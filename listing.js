@@ -1,5 +1,6 @@
 const Save = require('./save.js');
 const Discord = require('discord.js');
+const Index = require('./index.js');
 
 class Listing {
     constructor(name, price, startDate, endDate, id=0,channelID=0){
@@ -43,6 +44,7 @@ function OffsetDate(offset){
     return date;
 }
 
+
 function ListItem(depot, listing, channel){
   
     var embed = new Discord.RichEmbed();
@@ -63,13 +65,11 @@ function ListItem(depot, listing, channel){
     Save.SaveDepot(depot);
 }
 
-async function EndItem(depot, listing, channel){
-    console.log(listing.id);
+function EndItem(depot, listing, message){
+    var ended = new Discord.RichEmbed();
+    ended.setTitle("Ended");
 
-    channel.fetchMessage(listing.id).then ( async function (message) {
-        message.delete();
-    })
-
+    message.edit(ended);
     depot[listing.name] = {};
 
     Save.SaveDepot(depot);

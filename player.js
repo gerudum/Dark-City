@@ -30,10 +30,20 @@ class Player {
         this.level += amount;
     }
 
-    ExperienceGain(amount){
+    AddExperience(amount){
         this.experience += amount;
+        if(this.experience >= 100){
+            this.LevelUp(1);
+            this.experience = 0;
+        }
+    }
+
+    Offset(){
+        this.collection = new Date(this.collection);
+        collection.setSeconds(collection.getSeconds() + 3600);
     }
 }
+
 
 function FindPlayer(data,name){
     for(var key in data){

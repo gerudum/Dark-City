@@ -30,19 +30,20 @@ function Update(){
         listing.startDate = new Date(listing.startDate);
         listing.endDate = new Date(listing.endDate);
       
+        var channel = bot.channels.get("596021725620207682");
         //console.log(listing.startDate);
       
         if(listing.startDate <= new Date()){
             console.log("Listing Item");
-            var channel = bot.channels.get("596021725620207682");
             Listing.List(depot,listing,channel);
         }
 
-        if(listing.endDate <= new Date()){
-            var channel = bot.channels.get("596021725620207682");
+       /* if(listing.endDate <= new Date()){
             console.log(listing.id);
-            Listing.End(depot,listing,channel);
-        }
+            channel.fetchMessage(listing.id).then ( foundMessage => {
+                
+            });
+        } */
     }
 }
 
@@ -83,6 +84,7 @@ bot.on('message', message=> {
 
     //Reinstancing the player so we have access to the functions.
     let player = data[playerID];
+    player.AddExperience(1);
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
@@ -95,6 +97,20 @@ bot.on('message', message=> {
     }  
     
     switch(args[0]){
+        case 'collect':
+            player.collection = new Date(player.collection);
+            var total = 0;
+            while(player.collection <= new Date()){
+                player.AddPoints(player.level * 5);
+                total += (player.level * 5);
+                player.collection = Player.Offset();
+            }
+
+            var receivePoints = new Discord.RichEmbed();
+            
+            receivePoints.setTitle("You collected your hourly income!")
+            receivePoints.addField("Points collected: ", total);
+        break;
         case 'clear':
             if(!message.member.roles.has(admin)){ return; }
             data = {};
