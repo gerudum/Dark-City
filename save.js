@@ -4,7 +4,7 @@ const fs = require('fs');
 function Validate(json){
     try {
         var save = JSON.stringify(json);
-        var load = JSON.parse(save);
+        var load = JSON.parse(fs.readFileSync(save,'utf8'));
         return true;
     } catch (e){
         console.log("Invalid Data, will not save");
