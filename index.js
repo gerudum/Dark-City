@@ -31,22 +31,31 @@ function Update(){
         listing.endDate = new Date(listing.endDate);
       
         //Reinstance it so that we have the functions.
-        listing = new Listing.Listing(listing.name,listing.points,listing.startDate,listing.endDate,listing.channelToSend,listing.id);
+        var channelToSend = bot.channels.get("631213218035138581");
+
+        listing = new Listing.Listing(listing.name,listing.price,listing.startDate,listing.endDate,channelToSend,listing.id);
       
-        var channel = bot.channels.get("596021725620207682");
         //console.log(listing.startDate);
       
         if(listing.startDate <= new Date()){
-            console.log("Listing Item");
-            listing.List();
+            listing.startDate = Listing.Offset(10000000);
+            channelToSend.send(listing.embed).then ( sentEmbed => {
+                listing.id = sentEmbed.id;
+
+                depot[key] = listing;
+                Save.SaveDepot(depot);
+            }); 
         }
 
         if(listing.endDate <= new Date()){
-            listing.End();
+            channelToSend.fetchMessage(listing.id).then ( foundMessage => {
+                foundMessage.delete();
+                depot[key] = {};
+                Save.SaveDepot(depot);
+            }); 
         }
       
-        depot[key] = listing;
-        Save.SaveDepot(depot);
+     
     }
 }
 
@@ -120,13 +129,6 @@ bot.on('message', message=> {
         case 'clear':
             if(!message.member.roles.has(admin)){ return; }
         
-            for(var key in data){
-                data[key].level = 1;
-                data[key].experienceRequired = 110;
-                data[key].experience = 0;
-                Save.SaveData(data);
-            }
-        
             depot = {};
         break;
         case 'list':
@@ -143,8 +145,8 @@ bot.on('message', message=> {
                 startDate = Listing.Offset(parseInt(args[3]));
                 endDate = Listing.Offset(parseInt(args[4]));
 
-                var channelToSend = bot.channels.get("596021725620207682");
-                let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend);
+                var channelToSend = bot.channels.get("631213218035138581");
+                let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend,0);
                 depot[listing.name] = listing;
 
                 message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);

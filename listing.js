@@ -3,7 +3,8 @@ const Discord = require('discord.js');
 const Index = require('./index.js');
 
 class Listing {
-    constructor(name, price, startDate, endDate, channel, id=0){
+    constructor(name, price, startDate, endDate, channel, id){
+        this.id = id;
         this.channel = channel;
         this.name = name;
         this.price = price;
@@ -42,13 +43,7 @@ class Listing {
             return false;
         }
     }
-  
-    List(){
-        this.channelToSend.send(this.embed).then ( sentEmbed => {
-          this.id = sentEmbed.id;
-        });   
-    }
-  
+
     End(){
         this.channelToSend.fetchMessage(this.id).then ( foundMessage => { 
             foundMessage.delete();
