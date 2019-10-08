@@ -3,13 +3,21 @@ const Discord = require('discord.js');
 const Index = require('./index.js');
 
 class Listing {
-    constructor(name, price, startDate, endDate, id=0,channelID=0){
-        this.id = id;
-        this.channelID = channelID;
+    constructor(name, price, startDate, endDate, channel, id=0){
+        this.channel = channel;
         this.name = name;
         this.price = price;
         this.startDate = new Date(startDate);
         this.endDate = new Date(endDate);
+        
+        var embed = new Discord.RichEmbed();
+      
+        embed.setTitle("Depot Item");
+        embed.addField("Item", this.name)
+        embed.addField("Price ", this.price + " points")
+        embed.addField("End Date ", this.endDate)
+
+        this.embed = embed; 
     }
 
     GetDate(offset){
@@ -34,6 +42,18 @@ class Listing {
             return false;
         }
     }
+  
+    List(){
+        this.channelToSend.send(this.embed).then ( sentEmbed => {
+          this.id = sentEmbed.id;
+        });   
+    }
+  
+    End(){
+        this.channelToSend.fetchMessage(this.id).then ( foundMessage => { 
+            foundMessage.delete();
+        })
+    }
 }
 
 
@@ -44,39 +64,5 @@ function OffsetDate(offset){
     return date;
 }
 
-
-function ListItem(depot, listing, channel){
-  
-    var embed = new Discord.RichEmbed();
-
-    //Put it out there!
-    embed.setTitle("Depot Item");
-    embed.addField("Item", listing.name)
-    embed.addField("Price ", listing.price + " points")
-    embed.addField("End Date ", listing.endDate)
-
-    channel.send(embed).then ( sentEmbed => {
-        listing.id = sentEmbed.id;
-    });
-
-    //So it doesn't start multiple times
-    listing.startDate = OffsetDate(10000000);
-    depot[listing.name] = listing;
-
-    Save.SaveDepot(depot);
-}
-
-function EndItem(depot, listing, message){
-    var ended = new Discord.RichEmbed();
-    ended.setTitle("Ended");
-
-    message.edit(ended);
-    depot[listing.name] = {};
-
-    Save.SaveDepot(depot);
-}
-
 module.exports.Listing = Listing;
-module.exports.List = ListItem;
-module.exports.End = EndItem;
 module.exports.Offset = OffsetDate;
