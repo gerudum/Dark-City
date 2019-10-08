@@ -51,6 +51,7 @@ function ListItem(depot, listing, channel){
 
     //Put it out there!
     embed.setTitle("Depot Item");
+    embed.addField("Item", listing.name)
     embed.addField("Price ", listing.price + " points")
     embed.addField("End Date ", listing.endDate)
 
