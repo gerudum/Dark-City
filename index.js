@@ -100,16 +100,19 @@ bot.on('message', message=> {
         case 'collect':
             player.collection = new Date(player.collection);
             var total = 0;
+            
             while(player.collection <= new Date()){
                 player.AddPoints(player.level * 5);
                 total += (player.level * 5);
-                player.collection = Player.Offset();
+                player.collection = player.Offset();
             }
 
             var receivePoints = new Discord.RichEmbed();
-            
+
             receivePoints.setTitle("You collected your hourly income!")
             receivePoints.addField("Points collected: ", total);
+
+            message.channel.send(receivePoints);
         break;
         case 'clear':
             if(!message.member.roles.has(admin)){ return; }

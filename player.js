@@ -38,9 +38,11 @@ class Player {
         }
     }
 
-    Offset(){
-        this.collection = new Date(this.collection);
-        collection.setSeconds(collection.getSeconds() + 3600);
+    Offset(collection){
+        var offset = new Date(collection);
+        offset.setSeconds(offset.getSeconds() + 3600);
+
+        return offset;
     }
 }
 
