@@ -30,20 +30,23 @@ function Update(){
         listing.startDate = new Date(listing.startDate);
         listing.endDate = new Date(listing.endDate);
       
+        //Reinstance it so that we have the functions.
+        listing = new Listing.Listing(listing.name,listing.points,listing.startDate,listing.endDate,listing.channelToSend,listing.id);
+      
         var channel = bot.channels.get("596021725620207682");
         //console.log(listing.startDate);
       
         if(listing.startDate <= new Date()){
             console.log("Listing Item");
-            Listing.List(depot,listing,channel);
+            listing.List();
         }
 
-       /* if(listing.endDate <= new Date()){
-            console.log(listing.id);
-            channel.fetchMessage(listing.id).then ( foundMessage => {
-                
-            });
-        } */
+        if(listing.endDate <= new Date()){
+            listing.End();
+        }
+      
+        depot[key] = listing;
+        Save.SaveDepot(depot);
     }
 }
 
@@ -97,10 +100,10 @@ bot.on('message', message=> {
     }  
     
     switch(args[0]){
-        case 'collect':
+        /*case 'collect':
             player.collection = new Date(player.collection);
             var total = 0;
-            
+
             while(player.collection <= new Date()){
                 player.AddPoints(player.level * 5);
                 total += (player.level * 5);
@@ -113,10 +116,17 @@ bot.on('message', message=> {
             receivePoints.addField("Points collected: ", total);
 
             message.channel.send(receivePoints);
-        break;
+        break;*/
         case 'clear':
             if(!message.member.roles.has(admin)){ return; }
-            data = {};
+        
+            for(var key in data){
+                data[key].level = 1;
+                data[key].experienceRequired = 110;
+                data[key].experience = 0;
+                Save.SaveData(data);
+            }
+        
             depot = {};
         break;
         case 'list':
@@ -133,7 +143,8 @@ bot.on('message', message=> {
                 startDate = Listing.Offset(parseInt(args[3]));
                 endDate = Listing.Offset(parseInt(args[4]));
 
-                let listing = new Listing.Listing(name,points,startDate,endDate,message.channel.id);
+                var channelToSend = bot.channels.get("596021725620207682");
+                let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend);
                 depot[listing.name] = listing;
 
                 message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);
@@ -151,6 +162,7 @@ bot.on('message', message=> {
             embed.addField("Points",player.points);
             embed.addField("Coins",player.coins);
             embed.addField("Experience",player.experience);
+            embed.addField("Experience for Next Level",Math.floor(player.experienceRequired));
             embed.addField("Level",player.level);
 
             message.channel.send(embed);
