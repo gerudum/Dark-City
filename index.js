@@ -59,6 +59,17 @@ function Update(){
     }
 }
 
+function Embed(channelID,msg){
+    var embed = new Discord.RichEmbed();
+   
+    embed.addField("Important",msg);
+    embed.setThumbnail("https://imgur.com/dcsvH0k.png");
+    embed.setFooter("Read all about it!");
+
+    var channel = bot.channels.get(channelID);
+    channel.send(embed);
+}
+
 
 bot.on('guildMemberAdd', member => {
     member.guild.channels.get('channelID').send("Welcome " + member.displayName); 
@@ -108,118 +119,107 @@ bot.on('message', message=> {
         admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
     }  
     
-    switch(args[0]){
-        /*case 'collect':
-            player.collection = new Date(player.collection);
-            var total = 0;
-
-            while(player.collection <= new Date()){
-                player.AddPoints(player.level * 5);
-                total += (player.level * 5);
-                player.collection = player.Offset();
-            }
-
-            var receivePoints = new Discord.RichEmbed();
-
-            receivePoints.setTitle("You collected your hourly income!")
-            receivePoints.addField("Points collected: ", total);
-
-            message.channel.send(receivePoints);
-        break;*/
-        case 'clear':
-            if(!message.member.roles.has(admin)){ return; }
-        
-            depot = {};
-        break;
-        case 'list':
-            if(!message.member.roles.has(admin)){ return; }
-            if(!args[4]) { return; }
-
-            try {
-
-                var name = args[1];
-                var points = parseInt(args[2]);
-                var startDate = new Date();
-                var endDate = new Date();
-
-                startDate = Listing.Offset(parseInt(args[3]));
-                endDate = Listing.Offset(parseInt(args[4]));
-
-                var channelToSend = bot.channels.get("631213218035138581");
-                let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend,0);
-                depot[listing.name] = listing;
-
-                message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);
-            } catch (e){
-                console.log(e);
-                message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]");
-            }
-        
-        break;
-
-        case 'stats':
-            var embed = new Discord.RichEmbed();
-
-            embed.setTitle(player.name + "'s Stats");
-            embed.addField("Points",player.points);
-            embed.addField("Coins",player.coins);
-            embed.addField("Experience",player.experience);
-            embed.addField("Experience for Next Level",Math.floor(player.experienceRequired));
-            embed.addField("Level",player.level);
-
-            message.channel.send(embed);
-        break;
-
-        case 'log':
-            if(!message.member.roles.has(admin)){ return; }
-                switch (args[1]) {
-                    case 'data':
-                        Log.Log(message.channel,'.data/data.json');
-                    break;
-                    case 'chat':
-                        Log.Log(message.channel,'.data/chat.json');
-                    break;
-                    case 'depot':
-                        Log.Log(message.channel,'.data/depot.json');
-                    break;
-                }
-        break;
-
-       //Add Coins
-        case 'addcoin':
+    if(message.content.startsWith(prefix)){
+        switch(args[0]){
+            case 'info':
+                var content = message.content.replace("/info","");
+                Embed("595970413528481792",content);
+            break;
+            case 'clear':
                 if(!message.member.roles.has(admin)){ return; }
-
-                try {           
-                    var person = Player.FindPlayer(data,args[1]);
-                    var amount = parseFloat(args[2].toString());
-
-                    person.AddCoins(amount);      
-                    message.reply(amount + " coins Added to " + person.name);
-                } catch(e) {
-                    message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                    console.log(person + " " + amount);
-                }
-        break;
-
-        //Add Points
-        case 'add':
-                if(!message.member.roles.has(admin)){
-                    message.author.send("You do not have the necessary role(s).");
-                    return;
-                }
-
+            
+                depot = {};
+            break;
+            case 'list':
+                if(!message.member.roles.has(admin)){ return; }
+                if(!args[4]) { message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]"); return; }
+    
                 try {
-                    var person = Player.FindPlayer(data,args[1]);
-                    var amount = parseFloat(args[2].toString());
-
-                    person.AddPoints(amount); 
-                    message.reply(amount + " points Added to " + person.name); 
-                } catch(e) {
-                    message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                    console.log(args[0] +  args[1] + args[2] + " " + amount);
-                }  
-        break;      
-    }  
+    
+                    var name = args[1];
+                    var points = parseInt(args[2]);
+                    var startDate = new Date();
+                    var endDate = new Date();
+    
+                    startDate = Listing.Offset(parseInt(args[3]));
+                    endDate = Listing.Offset(parseInt(args[4]));
+    
+                    var channelToSend = bot.channels.get("631213218035138581");
+                    let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend,0);
+                    depot[listing.name] = listing;
+    
+                    message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);
+                } catch (e){
+                    console.log(e);
+                    message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]");
+                }
+            
+            break;
+    
+            case 'stats':
+                var embed = new Discord.RichEmbed();
+    
+                embed.setTitle(player.name + "'s Stats");
+                embed.addField("Points",player.points);
+                embed.addField("Coins",player.coins);
+                embed.addField("Experience",player.experience);
+                embed.addField("Experience for Next Level",Math.floor(player.experienceRequired));
+                embed.addField("Level",player.level);
+    
+                message.channel.send(embed);
+            break;
+    
+            case 'log':
+                if(!message.member.roles.has(admin)){ return; }
+                    switch (args[1]) {
+                        case 'data':
+                            Log.Log(message.channel,'.data/data.json');
+                        break;
+                        case 'chat':
+                            Log.Log(message.channel,'.data/chat.json');
+                        break;
+                        case 'depot':
+                            Log.Log(message.channel,'.data/depot.json');
+                        break;
+                    }
+            break;
+    
+           //Add Coins
+            case 'addcoin':
+                    if(!message.member.roles.has(admin)){ return; }
+    
+                    try {           
+                        var person = Player.FindPlayer(data,args[1]);
+                        var amount = parseFloat(args[2].toString());
+    
+                        person.AddCoins(amount);      
+                        message.reply(amount + " coins Added to " + person.name);
+                    } catch(e) {
+                        message.reply("Failed to give points, Syntax: /add [playerName] [points]");
+                        console.log(person + " " + amount);
+                    }
+            break;
+    
+            //Add Points
+            case 'add':
+                    if(!message.member.roles.has(admin)){
+                        message.author.send("You do not have the necessary role(s).");
+                        return;
+                    }
+    
+                    try {
+                        var person = Player.FindPlayer(data,args[1]);
+                        var amount = parseFloat(args[2].toString());
+    
+                        person.AddPoints(amount); 
+                        message.reply(amount + " points Added to " + person.name); 
+                    } catch(e) {
+                        message.reply("Failed to give points, Syntax: /add [playerName] [points]");
+                        console.log(args[0] +  args[1] + args[2] + " " + amount);
+                    }  
+            break;      
+        }  
+    }
     
     //All Data we need to keep track of
     Save.SaveData(data);
