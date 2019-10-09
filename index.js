@@ -50,7 +50,8 @@ function Update(){
         if(listing.endDate <= new Date()){
             channelToSend.fetchMessage(listing.id).then ( foundMessage => {
                 foundMessage.delete();
-                depot[key] = {};
+
+                delete depot[key];
                 Save.SaveDepot(depot);
             }); 
         }
@@ -139,7 +140,11 @@ bot.on('message', message=> {
                 try {
     
                     var name = args[1];
-                    let splitName = name.split(".");
+                    var splitName = name;
+
+                    for(var i = 0; i < name.length; i++){
+                        splitName = splitName.replace("."," ");
+                    }
 
                     var points = parseInt(args[2]);
                     var startDate = new Date();
