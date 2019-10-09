@@ -123,7 +123,7 @@ bot.on('message', message=> {
         switch(args[0]){
             case 'embed':
                 if(!message.member.roles.has(admin)){ return; }
-                
+
                 var content = message.content.replace("/embed","");
                 Embed(message.channel.id,content);
             break;
@@ -139,6 +139,8 @@ bot.on('message', message=> {
                 try {
     
                     var name = args[1];
+                    let splitName = name.substring.split(".");
+
                     var points = parseInt(args[2]);
                     var startDate = new Date();
                     var endDate = new Date();
@@ -147,7 +149,7 @@ bot.on('message', message=> {
                     endDate = Listing.Offset(parseInt(args[4]));
     
                     var channelToSend = bot.channels.get("631213218035138581");
-                    let listing = new Listing.Listing(name,points,startDate,endDate,channelToSend,0);
+                    let listing = new Listing.Listing(splitName,points,startDate,endDate,channelToSend,0);
                     depot[listing.name] = listing;
     
                     message.reply("Item listed " + listing.name + " is scheduled to appear at " + listing.startDate + " for " + listing.price + " points and end at " + listing.endDate);
