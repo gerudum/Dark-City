@@ -65,7 +65,7 @@ function Embed(channelID,msg){
     embed.addField("Important",msg);
     embed.setThumbnail("https://imgur.com/dcsvH0k.png");
     embed.setFooter("Read all about it!");
-
+    embed.setColor('#0099ff')
     var channel = bot.channels.get(channelID);
     channel.send(embed);
 }
@@ -121,9 +121,11 @@ bot.on('message', message=> {
     
     if(message.content.startsWith(prefix)){
         switch(args[0]){
-            case 'info':
-                var content = message.content.replace("/info","");
-                Embed("595970413528481792",content);
+            case 'embed':
+                if(!message.member.roles.has(admin)){ return; }
+                
+                var content = message.content.replace("/embed","");
+                Embed(message.channel.id,content);
             break;
             case 'clear':
                 if(!message.member.roles.has(admin)){ return; }
