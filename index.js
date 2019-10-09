@@ -139,7 +139,7 @@ bot.on('message', message=> {
                 try {
     
                     var name = args[1];
-                    let splitName = name.substring.split(".");
+                    let splitName = name.split(".");
 
                     var points = parseInt(args[2]);
                     var startDate = new Date();
