@@ -198,7 +198,15 @@ bot.on('message', message=> {
                     if(!message.member.roles.has(admin)){ return; }
     
                     try {           
+                       
+
+                        var name = args[1];
+                        for(var i = 0; i < args[1].length; i++){
+                            name = name.replace("."," ");
+                        }
+                        
                         var person = Player.FindPlayer(data,args[1]);
+
                         var amount = parseFloat(args[2].toString());
     
                         person.AddCoins(amount);      
@@ -217,7 +225,13 @@ bot.on('message', message=> {
                     }
     
                     try {
-                        var person = Player.FindPlayer(data,args[1]);
+                     
+                        var name = args[1];
+                        for(var i = 0; i < args[1].length; i++){
+                            name = name.replace("."," ");
+                        }
+
+                        var person = Player.FindPlayer(data,name);
                         var amount = parseFloat(args[2].toString());
     
                         person.AddPoints(amount); 
