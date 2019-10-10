@@ -71,13 +71,13 @@ function Embed(channelID,msg){
     channel.send(embed);
 }
 
-
 bot.on('guildMemberAdd', member => {
     member.guild.channels.get('channelID').send("Welcome " + member.displayName); 
 });
 
 bot.on('ready', () => {
     console.log("Raring to go!");
+    DataChecker();
 })
 
 bot.on('message', message=> {
@@ -258,7 +258,32 @@ bot.on('message', message=> {
                         message.reply("Failed to give points, Syntax: /add [playerName] [points]");
                         console.log(args[0] +  args[1] + args[2] + " " + amount);
                     }  
-            break;      
+            break;   
+            
+             //Add Points
+             case 'addexp':
+                    if(!message.member.roles.has(admin)){
+                        message.author.send("You do not have the necessary role(s).");
+                        return;
+                    }
+    
+                    try {
+                     
+                        var name = args[1];
+                        for(var i = 0; i < args[1].length; i++){
+                            name = name.replace("."," ");
+                        }
+
+                        var person = Player.FindPlayer(data,name);
+                        var amount = parseFloat(args[2].toString());
+    
+                        person.AddExperience(amount); 
+                        message.reply(amount + " points Added to " + person.name); 
+                    } catch(e) {
+                        message.reply("Failed to give points, Syntax: /add [playerName] [points]");
+                        console.log(args[0] +  args[1] + args[2] + " " + amount);
+                    }  
+            break; 
         }  
     }
     
