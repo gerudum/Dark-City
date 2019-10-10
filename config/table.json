@@ -1,6 +1,6 @@
 {
 "slots":{
-  "base"{
+  "base":{
     "level1":{
       "weight":100,
     },
@@ -48,7 +48,7 @@
   }
 },
 "prize":{
-    "base"{
+    "base":{
       "level1":{
           "prize":1
       },
