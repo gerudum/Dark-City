@@ -2,22 +2,22 @@
 "slots":{
   "base":{
     "level1":{
-      "weight":100,
+      "weight":100
     },
     "level2":{
-      "weight":90,
+      "weight":90
     },
     "level3":{
-      "weight":70,
+      "weight":70
     },
     "level4":{
-      "weight":65,
+      "weight":65
     },
     "level5":{
-      "weight":40,
+      "weight":40
     },
     "level6":{
-      "weight":25,
+      "weight":25
     },
     "level7":{
       "weight":10
@@ -25,22 +25,22 @@
   },
   "multiplier":{
     "level1":{
-      "weight":100,
+      "weight":100
     },
     "level2":{
-      "weight":90,
+      "weight":90
     },
     "level3":{
-      "weight":70,
+      "weight":70
     },
     "level4":{
-      "weight":65,
+      "weight":65
     },
     "level5":{
-      "weight":40,
+      "weight":40
     },
     "level6":{
-      "weight":25,
+      "weight":25
     },
     "level7":{
       "weight":10
