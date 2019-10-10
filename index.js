@@ -132,25 +132,27 @@ bot.on('message', message=> {
                     return;
                 }
 
-                if(player.coins >= Casino.cost){
-                    var rolls = parseInt(args[1]);
-                    if(rolls <= 0) { return; }
+                var rolls = parseInt(args[1]);
+                    
+                if(player.coins < rolls) { return; }
+                if(rolls <= 0) { return; }
 
-                    var prizes = [];
-                    for(var i = 0; i < rolls; i++){
-                        var prize = Casino.Slots();
-                        player.points += prize;
-                        prizes.push(prize + " points.");
-                    }
-   
-                    var slotMachine = new Discord.RichEmbed();
-                    slotMachine.setTitle("Slot Machine");
-                    slotMachine.addField("You spun " + rolls + " times and paid a price of: " + (Casino.cost * rolls) + " and won a prize of...", prizes );
-                    slotMachine.setFooter("Gamble it all away!");
-                    slotMachine.setColor('#0099ff');
-
-                    message.channel.send(slotMachine);
+                var prizes = [];
+                player.coins -= rolls;
+                for(var i = 0; i < rolls; i++){
+                    var prize = Casino.Slots();
+                    player.points += prize;
+               
+                    prizes.push(prize + " points.");
                 }
+
+                var slotMachine = new Discord.RichEmbed();
+                slotMachine.setTitle("Slot Machine");
+                slotMachine.addField("You spun " + rolls + " times, paid a price of " + (Casino.cost * rolls) + " coins, and won a prize of...", prizes );
+                slotMachine.setFooter("Gamble it all away!");
+                slotMachine.setColor('#0099ff');
+
+                message.channel.send(slotMachine); 
             break;
             case 'embed':
                 if(!message.member.roles.has(admin)){ return; }
