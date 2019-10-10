@@ -128,7 +128,7 @@ bot.on('message', message=> {
             case 'spin':
                 //Spin the wheel
                 if(!args[1]) { 
-                    message.reply("Invalid Syntaix: /spin [times]") 
+                    message.reply("Invalid Syntaix: /spin [times] - I would recommend spinning 1000 times or less") 
                     return;
                 }
 
@@ -143,12 +143,34 @@ bot.on('message', message=> {
                     var prize = Casino.Slots();
                     player.points += prize;
                
-                    prizes.push(prize + " points.");
+                    prizes.push(prize + ", ");
                 }
+
+                prizes.push(" points");
+
+                var prizeString = "";
+                var charLimit = 1024;
 
                 var slotMachine = new Discord.RichEmbed();
                 slotMachine.setTitle("Slot Machine");
-                slotMachine.addField("You spun " + rolls + " times, paid a price of " + (Casino.cost * rolls) + " coins, and won a prize of...", prizes );
+                slotMachine.addField("...","You spun " + rolls + " times, paid a price of " + (Casino.cost * rolls) + " coins, and won a prize of...");
+               
+                var splits = 0;
+                for(var i = 0; i < prizes.length; i++){
+                    prizeString += prizes[i].toString();
+                    if(prizeString.length > charLimit){
+                        var field = prizeString.substring(0,1024);
+                        slotMachine.addField("Prize Field ", field);
+
+                        splits += 1;
+                        prizeString = "";
+                    }
+
+                    if(i == (prizes.length-1) && splits == 0){
+                        slotMachine.addField("Prize Field ", prizeString);
+                    }
+                }
+
                 slotMachine.setFooter("Gamble it all away!");
                 slotMachine.setColor('#0099ff');
 
@@ -237,7 +259,7 @@ bot.on('message', message=> {
                             name = name.replace("."," ");
                         }
                         
-                        var person = Player.FindPlayer(data,args[1]);
+                        var person = Player.FindPlayer(data,args[1].toLowerCase());
 
                         var amount = parseFloat(args[2].toString());
     
