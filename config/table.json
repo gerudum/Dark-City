@@ -1,1 +1,48 @@
-{}
+{
+"SLOTS":{
+  "LEVEL1":{
+    "WEIGHT":100,
+  },
+  "LEVEL2":{
+    "WEIGHT":90,
+  },
+  "LEVEL3":{
+    "WEIGHT":70,
+  },
+  "LEVEL4":{
+    "WEIGHT":65,
+  },
+  "LEVEL5":{
+    "WEIGHT":40,
+  },
+  "LEVEL6":{
+    "WEIGHT":25,
+  },
+  "LEVEL7":{
+    "WEIGHT":10,
+  }
+},
+"PRIZE":{
+  "LEVEL1":{
+      "MULTIPLIER":2
+  },
+  "LEVEL2":{
+      "MULTIPLIER":4
+  },
+  "LEVEL3":{
+      "MULTIPLIER":6
+  },
+  "LEVEL4":{
+      "MULTIPLIER":10
+  },
+  "LEVEL5":{
+      "MULTIPLIER":20
+  },
+  "LEVEL6":{
+      "MULTIPLIER":50
+  },
+  "LEVEL7":{
+      "MULTIPLIER":100
+  }
+}
+}
