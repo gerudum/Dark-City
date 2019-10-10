@@ -122,6 +122,24 @@ bot.on('message', message=> {
     
     if(message.content.startsWith(prefix)){
         switch(args[0]){
+            case 'createtable':
+                //Alpha
+            break;
+            case 'spin':
+                //Spin the wheel
+                if(player.coins >= Casino.cost){
+                    var prize = Casino.Slots();
+                    player.coins += prize;
+
+                    var slotMachine = new Discord.RichEmbed();
+                    slotMachine.setTitle("Slot Machine");
+                    slotMachine.addField("You paid " + Casino.cost + " and won a prize of...", prize + " coins" );
+                    slotMachine.setFooter("Read all about it!");
+                    slotMachine.setColor('#0099ff');
+
+                    message.channel.send(slotMachine);
+                }
+            break;
             case 'embed':
                 if(!message.member.roles.has(admin)){ return; }
 
@@ -145,7 +163,7 @@ bot.on('message', message=> {
                     for(var i = 0; i < name.length; i++){
                         splitName = splitName.replace("."," ");
                     }
-
+                    
                     var points = parseInt(args[2]);
                     var startDate = new Date();
                     var endDate = new Date();

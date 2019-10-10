@@ -2,47 +2,61 @@
 "slots":{
   "base":{
     "level1":{
+      "result":"level1",
       "weight":100
     },
     "level2":{
+      "result":"level2",
       "weight":90
     },
     "level3":{
+      "result":"level3",
       "weight":70
     },
     "level4":{
+      "result":"level4",
       "weight":65
     },
     "level5":{
+      "result":"level5",
       "weight":40
     },
     "level6":{
+      "result":"level6",
       "weight":25
     },
     "level7":{
+      "result":"level7",
       "weight":10
     }
   },
   "multiplier":{
     "level1":{
+      "result":"level1",
       "weight":100
     },
     "level2":{
+      "result":"level2",
       "weight":90
     },
     "level3":{
+      "result":"level3",
       "weight":70
     },
     "level4":{
+      "result":"level4",
       "weight":65
     },
     "level5":{
+      "result":"level5",
       "weight":40
     },
     "level6":{
+      "result":"level6",
       "weight":25
     },
     "level7":{
+      "result":"level7",
       "weight":10
     }
   }
