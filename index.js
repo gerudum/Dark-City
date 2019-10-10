@@ -120,20 +120,33 @@ bot.on('message', message=> {
     }  
     
     if(message.content.startsWith(prefix)){
+        args[0] = args[0].toLowerCase();
         switch(args[0]){
             case 'createtable':
                 //Alpha
             break;
             case 'spin':
                 //Spin the wheel
-                if(player.coins >= Casino.cost){
-                    var prize = Casino.Slots();
-                    player.coins += prize;
+                if(!args[1]) { 
+                    message.reply("Invalid Syntaix: /spin [times]") 
+                    return;
+                }
 
+                if(player.coins >= Casino.cost){
+                    var rolls = parseInt(args[1]);
+                    if(rolls <= 0) { return; }
+
+                    var prizes = [];
+                    for(var i = 0; i < rolls; i++){
+                        var prize = Casino.Slots();
+                        player.points += prize;
+                        prizes.push(prize + " points.");
+                    }
+   
                     var slotMachine = new Discord.RichEmbed();
                     slotMachine.setTitle("Slot Machine");
-                    slotMachine.addField("You paid " + Casino.cost + " and won a prize of...", prize + " coins" );
-                    slotMachine.setFooter("Read all about it!");
+                    slotMachine.addField("You spun " + rolls + " times and paid a price of: " + (Casino.cost * rolls) + " and won a prize of...", prizes );
+                    slotMachine.setFooter("Gamble it all away!");
                     slotMachine.setColor('#0099ff');
 
                     message.channel.send(slotMachine);
@@ -289,7 +302,7 @@ bot.on('message', message=> {
                     message.author.send("You do not have the necessary role(s).");
                     return;
                 }
-                
+
                 delete data[playerID];
             break;
         }  

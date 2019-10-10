@@ -49,7 +49,7 @@ class Player {
 
 function FindPlayer(data,name){
     for(var key in data){
-        if(data[key].name == name){
+        if(data[key].name.toLowerCase() == name){
             return data[key];
         }
     }
