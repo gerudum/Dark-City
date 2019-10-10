@@ -166,7 +166,7 @@ bot.on('message', message=> {
                         prizeString = "";
                     }
 
-                    if(i == (prizes.length-1) && splits == 0){
+                    if(i == (prizes.length-1) && prizeString != ""){
                         slotMachine.addField("Prize Field ", prizeString);
                     }
                 }
