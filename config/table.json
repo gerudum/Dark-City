@@ -22,7 +22,7 @@
     "level7":{
       "weight":10
     }
-  }
+  },
   "multiplier":{
     "level1":{
       "weight":100,
@@ -70,8 +70,8 @@
       "level7":{
           "prize":25
       }
-    }
-    "multiplier"{
+    },
+    "multiplier":{
       "level1":{
           "multiplier":2
       },
