@@ -16,6 +16,7 @@ function Roll(entries){
         top+=entries[key].weight; 
 
         if(rand <= top){ 
+            console.log(key);
             return entries[key].result;                         
         }                 
     }  
@@ -28,8 +29,8 @@ function Slots(){
     var base = Roll(table["slots"].base);
     var multiplier = Roll(table["slots"].multiplier);
 
-    var baseValue = table["prize"].base[base];
-    var multiplierValue = table["prize"].multiplier[multiplier];
+    var baseValue = table["prize"].base[base].prize;
+    var multiplierValue = table["prize"].multiplier[multiplier].multiplier;
 
     var reward = baseValue * multiplierValue;
     return reward;

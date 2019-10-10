@@ -77,7 +77,6 @@ bot.on('guildMemberAdd', member => {
 
 bot.on('ready', () => {
     console.log("Raring to go!");
-    DataChecker();
 })
 
 bot.on('message', message=> {
@@ -260,8 +259,8 @@ bot.on('message', message=> {
                     }  
             break;   
             
-             //Add Points
-             case 'addexp':
+            //Add Points
+            case 'addexp':
                     if(!message.member.roles.has(admin)){
                         message.author.send("You do not have the necessary role(s).");
                         return;
@@ -284,6 +283,15 @@ bot.on('message', message=> {
                         console.log(args[0] +  args[1] + args[2] + " " + amount);
                     }  
             break; 
+
+            case 'reset':
+                if(!message.member.roles.has(admin)){
+                    message.author.send("You do not have the necessary role(s).");
+                    return;
+                }
+                
+                delete data[playerID];
+            break;
         }  
     }
     
