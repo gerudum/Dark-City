@@ -1,6 +1,4 @@
-const Save = require('./save.js');
 const Discord = require('discord.js');
-const Index = require('./index.js');
 
 class Listing {
     constructor(name, price, startDate, endDate, channel, id){
@@ -27,6 +25,7 @@ class Listing {
 
         return date;
     }
+
 
     Ready(){
         if(this.startDate <= new Date()){
@@ -59,5 +58,16 @@ function OffsetDate(offset){
     return date;
 }
 
+function SetDate(day,hour,minute,second){
+    var date = new Date();
+    date.setSeconds(second);
+    date.setMinutes(minute);
+    date.setHours(hour);
+    date.setDate(day);
+
+    return date;
+}
+
 module.exports.Listing = Listing;
 module.exports.Offset = OffsetDate;
+module.exports.SetDate = SetDate;

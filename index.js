@@ -187,6 +187,16 @@ bot.on('message', message=> {
             
                 depot = {};
             break;
+            case 'cancel':
+                if(!message.member.roles.has(admin)){ return; }
+
+            break;
+            case 'cancelall':
+                if(!message.member.roles.has(admin)){ return; }
+                for(var key in depot){
+                    delete depot[key];
+                }
+            break;
             case 'list':
                 if(!message.member.roles.has(admin)){ return; }
                 if(!args[4]) { message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]"); return; }
@@ -201,11 +211,25 @@ bot.on('message', message=> {
                     }
                     
                     var points = parseInt(args[2]);
+                    
                     var startDate = new Date();
                     var endDate = new Date();
     
-                    startDate = Listing.Offset(parseInt(args[3]));
-                    endDate = Listing.Offset(parseInt(args[4]));
+                    var start = args[3].substring(prefix.length).split(".");
+                    var end = args[4].substring(prefix.length).split(".");
+
+                    var startDay = parseInt(start[0]);
+                    var startHour = parseInt(start[1]);
+                    var startMinute = parseInt(start[2]);
+                    var startSecond =  parseInt(start[3]);
+
+                    var endDay = parseInt(end[0]);
+                    var endHour = parseInt(end[1]);
+                    var endMinute = parseInt(end[2]);
+                    var endSecond = parseInt(end[3]);
+
+                    startDate = Listing.SetDate(startDay,startHour,startMinute,startSecond);
+                    endDate = Listing.SetDate(endDay,endHour,endMinute,endSecond);
     
                     var channelToSend = bot.channels.get("631213218035138581");
                     let listing = new Listing.Listing(splitName,points,startDate,endDate,channelToSend,0);
