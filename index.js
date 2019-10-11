@@ -199,7 +199,7 @@ bot.on('message', message=> {
             break;
             case 'list':
                 if(!message.member.roles.has(admin)){ return; }
-                if(!args[4]) { message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]"); return; }
+                if(!args[12]) { message.reply("Invalid syntax: /list [name] [price] [startdate(seconds from now)] [enddate(seconds from now)]"); return; }
     
                 try {
     
@@ -211,25 +211,24 @@ bot.on('message', message=> {
                     }
                     
                     var points = parseInt(args[2]);
-                    
+
                     var startDate = new Date();
                     var endDate = new Date();
-    
-                    var start = args[3].substring(prefix.length).split(".");
-                    var end = args[4].substring(prefix.length).split(".");
+ 
+                    var startMonth = parseInt(args[3]);
+                    var startDay = parseInt(args[4]);
+                    var startHour = parseInt(args[5]);
+                    var startMinute = parseInt(args[6]);
+                    var startSecond =  parseInt(args[7]);
 
-                    var startDay = parseInt(start[0]);
-                    var startHour = parseInt(start[1]);
-                    var startMinute = parseInt(start[2]);
-                    var startSecond =  parseInt(start[3]);
+                    var endMonth = parseInt(args[8]);
+                    var endDay = parseInt(args[9]);
+                    var endHour = parseInt(args[10]);
+                    var endMinute = parseInt(args[11]);
+                    var endSecond = parseInt(args[12]);
 
-                    var endDay = parseInt(end[0]);
-                    var endHour = parseInt(end[1]);
-                    var endMinute = parseInt(end[2]);
-                    var endSecond = parseInt(end[3]);
-
-                    startDate = Listing.SetDate(startDay,startHour,startMinute,startSecond);
-                    endDate = Listing.SetDate(endDay,endHour,endMinute,endSecond);
+                    startDate = Listing.SetDate(startMonth,startDay,startHour,startMinute,startSecond);
+                    endDate = Listing.SetDate(endMonth,endDay,endHour,endMinute,endSecond);
     
                     var channelToSend = bot.channels.get("631213218035138581");
                     let listing = new Listing.Listing(splitName,points,startDate,endDate,channelToSend,0);

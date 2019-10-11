@@ -58,12 +58,13 @@ function OffsetDate(offset){
     return date;
 }
 
-function SetDate(day,hour,minute,second){
+function SetDate(month,day,hour,minute,second){
     var date = new Date();
-    date.setSeconds(second);
-    date.setMinutes(minute);
-    date.setHours(hour);
+    date.setMonth(month);
     date.setDate(day);
+    date.setHours(hour);
+    date.setMinutes(minute);
+    date.setSeconds(second);
 
     return date;
 }
