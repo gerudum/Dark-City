@@ -297,6 +297,7 @@ bot.on('message', message=> {
                 embed.setTitle(player.name + "'s Stats");
                 embed.addField("Points",player.points);
                 embed.addField("Coins",player.coins);
+                embed.addField("Event Boxes",player.box);
                 embed.addField("Experience",player.experience);
                 embed.addField("Experience for Next Level",Math.floor(player.experienceRequired));
                 embed.addField("Level",player.level);
