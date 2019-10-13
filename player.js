@@ -8,7 +8,7 @@ class Player {
         this.experience = experience;
         this.level = level;
         this.collection = collection;
-        this.box = 0;
+        this.box = box;
     }
 
     //Add Points to the player
