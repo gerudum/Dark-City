@@ -1,6 +1,6 @@
 class Player {
     //Create a New Player
-    constructor(name,avatar,points = 0, coins = 0, experience = 0, level = 1, collection = new Date()){
+    constructor(name,avatar,points = 0, coins = 0, experience = 0, level = 1, collection = new Date(), box = 0){
         this.name = name;
         this.avatar = avatar;
         this.points = points;
@@ -8,6 +8,7 @@ class Player {
         this.experience = experience;
         this.level = level;
         this.collection = collection;
+        this.box = 0;
     }
 
     //Add Points to the player

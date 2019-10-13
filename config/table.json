@@ -1,5 +1,71 @@
 {
 "slots":{
+  "box":{
+    "adventurer":{
+      "simpleorb":{
+        "result":"Simple Orb of Alchemy x3",
+        "weight":15
+      },"flawedorb":{
+        "result":"Flawed Orb of Alchemy x3",
+        "weight":45
+      },"advancedorb":{
+        "result":"Advanced Orb of Alchemy",
+        "weight":15
+      },"eliteorb":{
+        "result":"Elite Orb of Alchemy",
+        "weight":10
+      },"trinket":{
+        "result":"Trinket Slot Upgrade",
+        "weight":10
+      },"weapon":{
+        "result":"Weapon Slot Upgrade",
+        "weight":10
+      },"wolvercap":{
+        "result":"Wolver Cap",
+        "weight":20
+      },"wolvercoat":{
+        "result":"Wolver Coat",
+        "weight":20
+      },"demohelm":{
+        "result":"Spiral Demo Helm",
+        "weight":20
+      },"demosuit":{
+        "result":"Spiral Demo Suit",
+        "weight":20
+      },"swift":{
+        "result":"Swifstrike Buckler",
+        "weight":20
+      },"circuithelm":{
+        "result":"Circuit Breaker Helm",
+        "weight":50
+      },"circuitarmor":{
+        "result":"Circuit Breaker Armor",
+        "weight":50
+      },"circuitshield":{
+        "result":"Circuit Breaker Shield",
+        "weight":50
+      },"frosthelm":{
+        "result":"Frostbreaker Helm",
+        "weight":50
+      },"frostarmor":{
+        "result":"Frostbreaker Armor",
+        "weight":50
+      },"frostshield":{
+        "result":"Frostbreaker Shield",
+        "weight":50
+      },"firehelm":{
+        "result":"Emberbreak Helm",
+        "weight":50
+      },"firearmor":{
+        "result":"Emberbreak Armor",
+        "weight":50
+      },"fireshield":{
+        "result":"Emberbreak Shield",
+        "weight":50,
+        "total":655
+      }
+    }
+  },
   "base":{
     "level1":{
       "result":"level1",
