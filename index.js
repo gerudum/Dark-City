@@ -16,9 +16,11 @@ const prefix = "/";
 Listener.Listen();
 
 let data = JSON.parse(fs.readFileSync('.data/data.json','utf8'));
+let dataTable = JSON.parse(fs.readFileSync('.data/dataTable.json','utf8'));
 let depot = JSON.parse(fs.readFileSync('.data/depot.json','utf8'));
+let itemTable = JSON.parse(fs.readFileSync('.data/items.json','utf8'));
 
-setInterval(function() {
+/*setInterval(function() {
     Update();
 }, 10000);
 
@@ -66,7 +68,7 @@ async function UpdateListing(){
 function Update(){
     console.log("Updating");
     UpdateListing();
-}
+}*/
 
 function Embed(channelID,msg){
     var embed = new Discord.RichEmbed();
@@ -92,14 +94,20 @@ bot.on('message', message=> {
         return;
     } 
 
+
     //Reinstance everyone
     for(var key in data){
         var dude = data[key];
-        data[key] = new Player.Player(dude.name,dude.avatarURL,dude.points,dude.coins,dude.experience,dude.level,dude.collection,dude.box);
-    }
-    for(var key in depot){
-        var item = depot[key];
-        depot[key] = new Listing.Listing(item.name,item.price,item.startDate,item.endDate,item.id,item.channelID);
+
+        if(!dude.inventory) { dude.inventory = {}; }
+
+        data[key] = 
+        new Player.Player(
+            dude.name,
+            dude.avatarURL,
+            dude.points,
+            dude.coins,
+            dude.inventory);
     }
 
     Log.LogChat(message);
@@ -115,7 +123,6 @@ bot.on('message', message=> {
 
     //Reinstancing the player so we have access to the functions.
     let player = data[playerID];
-    player.AddExperience(1);
 
     //Arguments
     let args = message.content.substring(prefix.length).split(" ");
@@ -130,9 +137,49 @@ bot.on('message', message=> {
     if(message.content.startsWith(prefix)){
         args[0] = args[0].toLowerCase();
         switch(args[0]){
-            case 'createtable':
-                //Alpha
+            case 'createitem':
+                if(!message.member.roles.has(admin)) { return; }
+                if(!args[2]) { console.log("Syntax: [itemname] [usage]"); return; }
+
+                //Item Name and Usage
+                var itemName = args[1];
+                var itemUsage = args[2];
+
+                //Put the item in
+                itemTable[itemName] = {};
+                itemTable[itemName].name = itemName;
+                itemTable[itemUsage].usage = itemUsage;
             break;
+
+            case 'createtable':
+                if(!message.member.roles.has(admin)) { return; }
+                if(!args[3]) { return; }
+                //Alpha
+                //Create New Table
+                var newTable = {};
+
+                console.log(args[1]);
+
+                //Iterate through the arguments
+                for(var i = 2; i < args.length; i+=2){
+                    if(!args[i+1]) { return; }
+
+                    //We iterate by 2 every time instead of 1 as each item has 2 parameters
+
+                    //Result
+                    var result = args[i];
+                    //Weight
+                    var weight = parseFloat(args[i+1]);
+
+                    //Set them in the table
+                    newTable[result].result = result;
+                    newTable[result].weight = weight;
+                }
+
+                //Save the table
+                dataTable[args[1]] = newTable;
+            break;
+
             case 'spin':
                 //Spin the wheel
                 if(!args[1]) { 
@@ -184,46 +231,78 @@ bot.on('message', message=> {
 
                 message.channel.send(slotMachine); 
             break;
-            case 'unbox':
-                if(player.box <= 0) { 
-                    player.box = 0;
-                    return;
+
+            case 'inventory':
+                var inventory = new Discord.RichEmbed();
+                inventory.setTitle(player.name + "'s Inventory");
+
+                var items = [];
+                for(var key in player.inventory){
+                    items.push(player.inventory[key].name + " " + player.inventory[key].amount);
                 }
-                var unboxing = new Discord.RichEmbed();
-                unboxing.setTitle(player.name + "'s unboxing");
 
-                var prize = Casino.OpenBox("adventurer");
-                unboxing.addField(player.name + " earned a... ", prize);
+                inventory.addField("Items", player.inventory);
+                message.channel.send(items);
+            break;
 
-                player.box -= 1;
+            case 'use':
+                //Specify an item
+                if(!args[1]) { message.reply("Specify an item to use"); return; }
+                
+                //Get the item from the inventory
+                var myItem = player.inventory[args[1]];
+
+                //Usage statements
+                if(myItem === null) { message.reply("You don't have this item"); return; }
+                if(myItem.amount <= 0) { message.reply("You don't have this item"); return; }
+                if(myItem.usage === "none") { message.reply("This item can't be used"); return; }
+
+                //Only usable items right now are boxes.
+                var usage = new Discord.RichEmbed();
+                usage.setTitle(player.name + myItem.usage);
+
+                var prize = Casino.OpenBoxCustom(args[1]);
+                usage.addField(player.name + " earned a... ", prize);
+
+                person.RemoveItem(args[1], -1);
+
                 message.channel.send(unboxing);
             break;
-            case 'addbox':
+
+            case 'createitem':
                 if(!message.member.roles.has(admin)){ return; }
-    
-                try {           
-                       
+            break;
+
+            case 'additem':
+                if(!message.member.roles.has(admin)){ return; }
+                if(!args[3]) { message.reply("Syntax: [playername] [itemname] [amount]"); return;}
+                if(!itemTable[args[2]]) { console.log("Item does not exist, create a new item with /creatitem!"); return; }
+
+                try {     
+                          
+                    //args 1 = name
+                    //args 2 = item
+                    //args 3 = amount
 
                     var name = args[1];
                     for(var i = 0; i < args[1].length; i++){
                         name = name.replace("."," ");
                     }
                         
+                    //Find the person to add the item to
                     var person = Player.FindPlayer(data,args[1].toLowerCase());
 
-                    var amount = parseFloat(args[2].toString());
+                    //Get the amount of the item you want to add
+                    var amount = parseFloat(args[3].toString());
     
-                    person.box += amount;    
+                    person.AddItem(args[2],parseFloat(args[3]));
                     message.reply(amount + " boxes Added to " + person.name);
                 } catch(e) {
-                    message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                    console.log(person + " " + amount);
+
+                    message.reply("Syntax: [playername] [itemname] [amount]");
                 }
             break;
-            case 'box':
-                if(!message.member.roles.has(admin)){ return; }
-                player.box = 1000;
-            break;
+
             case 'embed':
                 if(!message.member.roles.has(admin)){ return; }
 
@@ -231,11 +310,13 @@ bot.on('message', message=> {
                 var content = message.content.replace("/embed","");
                 Embed(message.channel.id,content);
             break;
-            case 'clear':
+
+          /*case 'clear':
                 if(!message.member.roles.has(admin)){ return; }
             
                 depot = {};
             break;
+
             case 'cancel':
                 if(!message.member.roles.has(admin)){ return; }
 
@@ -290,17 +371,14 @@ bot.on('message', message=> {
                 }
             
             break;
-    
+                
+            */
             case 'stats':
                 var embed = new Discord.RichEmbed();
     
                 embed.setTitle(player.name + "'s Stats");
                 embed.addField("Points",player.points);
                 embed.addField("Coins",player.coins);
-                embed.addField("Event Boxes",player.box);
-                embed.addField("Experience",player.experience);
-                embed.addField("Experience for Next Level",Math.floor(player.experienceRequired));
-                embed.addField("Level",player.level);
     
                 message.channel.send(embed);
             break;
@@ -324,9 +402,7 @@ bot.on('message', message=> {
             case 'addcoin':
                     if(!message.member.roles.has(admin)){ return; }
     
-                    try {           
-                       
-
+                    try {               
                         var name = args[1];
                         for(var i = 0; i < args[1].length; i++){
                             name = name.replace("."," ");
@@ -368,31 +444,6 @@ bot.on('message', message=> {
                         console.log(args[0] +  args[1] + args[2] + " " + amount);
                     }  
             break;   
-            
-            //Add Points
-            case 'addexp':
-                    if(!message.member.roles.has(admin)){
-                        message.author.send("You do not have the necessary role(s).");
-                        return;
-                    }
-    
-                    try {
-                     
-                        var name = args[1];
-                        for(var i = 0; i < args[1].length; i++){
-                            name = name.replace("."," ");
-                        }
-
-                        var person = Player.FindPlayer(data,name);
-                        var amount = parseFloat(args[2].toString());
-    
-                        person.AddExperience(amount); 
-                        message.reply(amount + " points Added to " + person.name); 
-                    } catch(e) {
-                        message.reply("Failed to give points, Syntax: /add [playerName] [points]");
-                        console.log(args[0] +  args[1] + args[2] + " " + amount);
-                    }  
-            break; 
 
             case 'reset':
                 if(!message.member.roles.has(admin)){
@@ -408,6 +459,8 @@ bot.on('message', message=> {
     //All Data we need to keep track of
     Save.SaveData(data);
     Save.SaveDepot(depot);
+    Save.SaveTable(dataTable);
+    Save.SaveItem(itemTable);
 })
 
 bot.login(process.env.TOKEN);

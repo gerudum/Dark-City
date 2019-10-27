@@ -25,6 +25,11 @@ function Roll(entries){
     return null;
 }
 
+function OpenBoxCustom(pool){
+    var prize = Roll(pool);
+    return prize;
+}
+
 function OpenBox(pool){
     var prize = Roll(table["slots"].box[pool]);
     return prize;
@@ -44,3 +49,4 @@ function Slots(){
 module.exports.Slots = Slots;
 module.exports.cost = cost;
 module.exports.OpenBox = OpenBox;
+module.exports.OpenBoxCustom = OpenBoxCustom;

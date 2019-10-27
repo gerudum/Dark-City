@@ -1,14 +1,11 @@
 class Player {
     //Create a New Player
-    constructor(name,avatar,points = 0, coins = 0, experience = 0, level = 1, collection = new Date(), box = 0){
+    constructor(name, avatar, points = 0, coins = 0, inventory = {}){
         this.name = name;
         this.avatar = avatar;
         this.points = points;
         this.coins = coins;
-        this.experience = experience;
-        this.level = level;
-        this.collection = collection;
-        this.box = box;
+        this.inventory = inventory;
     }
 
     //Add Points to the player
@@ -27,15 +24,14 @@ class Player {
         }
     }
 
-    LevelUp(amount){
-        this.level += amount;
+    AddItem(item, amount){
+        this.inventory[item].amount += amount;
     }
 
-    AddExperience(amount){
-        this.experience += amount;
-        if(this.experience >= 100){
-            this.LevelUp(1);
-            this.experience = 0;
+    RemoveItem(item, amount){
+        this.inventory[item].amount -= amount;
+        if(this.inventory[item].amount <= 0){
+            this.inventory[item].amount = 0;
         }
     }
 

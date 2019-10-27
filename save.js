@@ -23,6 +23,24 @@ function SaveData(data){
     }  
 }
 
+//Save the newly created items
+function SaveItem(items){
+    if(Validate(items)){
+        fs.writeFile('.data/dataTable.json', JSON.stringify(items,null,2), (err) =>{
+            if (err) console.error(err);
+        })
+    } 
+}
+
+//Save the new spawn tables
+function SaveTable(table){
+    if(Validate(table)){
+        fs.writeFile('.data/dataTable.json', JSON.stringify(table,null,2), (err) =>{
+            if (err) console.error(err);
+        })
+    }  
+}
+
 //Save Depot
 function SaveDepot(depot){
     if(Validate(depot)){
@@ -34,4 +52,7 @@ function SaveDepot(depot){
 
 module.exports.SaveData = SaveData;
 module.exports.SaveDepot = SaveDepot;
+module.exports.SaveTable = SaveTable;
+module.exports.SaveItem = SaveItem;
 module.exports.Validate = Validate;
+
