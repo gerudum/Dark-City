@@ -247,7 +247,7 @@ bot.on('message', message=> {
                 }
 
                 inventory.addField("Items", player.inventory);
-                message.channel.send(items);
+                message.channel.send(inventory);
             break;
 
             case 'use':
@@ -269,7 +269,7 @@ bot.on('message', message=> {
                 var prize = Casino.OpenBoxCustom(args[1]);
                 usage.addField(player.name + " earned a... ", prize);
 
-                person.RemoveItem(args[1], -1);
+                player.RemoveItem(args[1], -1);
 
                 message.channel.send(unboxing);
             break;
@@ -396,6 +396,12 @@ bot.on('message', message=> {
                         break;
                         case 'depot':
                             Log.Log(message.channel,'.data/depot.json');
+                        break;
+                        case 'table':
+                            Log.Log(message.channel,'.data/dataTable.json');
+                        break;
+                        case 'items':
+                            Log.Log(message.channel,'.data/items.json');
                         break;
                     }
             break;

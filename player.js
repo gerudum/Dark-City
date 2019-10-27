@@ -26,6 +26,7 @@ class Player {
 
     AddItem(item, amount){
         if(!this.inventory[item]){
+            this.inventory[item] = {};
             this.inventory[item].name = item;
             this.inventory[item].amount = 1;
         } else {
