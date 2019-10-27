@@ -246,7 +246,7 @@ bot.on('message', message=> {
                     items.push(player.inventory[key].name + " " + player.inventory[key].amount);
                 }
 
-                inventory.addField("Items", player.inventory);
+                inventory.addField("Items", items);
                 message.channel.send(inventory);
             break;
 
@@ -255,7 +255,9 @@ bot.on('message', message=> {
                 if(!args[1]) { message.reply("Specify an item to use"); return; }
                 
                 //Get the item from the inventory
-                var myItem = player.inventory[args[1]];
+                myItem = itemTable[args[1]];
+                console.log(myItem.name);
+                console.log(myItem.usage);
 
                 //Usage statements
                 if(myItem === null) { message.reply("You don't have this item"); return; }
@@ -264,14 +266,14 @@ bot.on('message', message=> {
 
                 //Only usable items right now are boxes.
                 var usage = new Discord.RichEmbed();
-                usage.setTitle(player.name + myItem.usage);
+                usage.setTitle(player.name + " " + myItem.usage);
 
-                var prize = Casino.OpenBoxCustom(args[1]);
+                var prize = Casino.OpenBoxCustom(dataTable[myItem.usage]);
                 usage.addField(player.name + " earned a... ", prize);
 
-                player.RemoveItem(args[1], -1);
+                player.RemoveItem(args[1], 1);
 
-                message.channel.send(unboxing);
+                message.channel.send(usage);
             break;
 
             case 'additem':
