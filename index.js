@@ -150,7 +150,7 @@ bot.on('message', message=> {
                 itemTable[itemName].name = itemName;
                 itemTable[itemUsage].usage = itemUsage;
 
-                message.reply("Item Created", itemTable[itemName].name, itemTable[itemUsage].usage);
+                message.reply("Item Created" + " " + itemTable[itemName].name + " " + itemTable[itemUsage].usage);
             break;
 
             case 'createtable':
