@@ -242,6 +242,7 @@ bot.on('message', message=> {
                 inventory.setTitle(player.name + "'s Inventory");
 
                 var items = [];
+                items.push("Inventory");
                 for(var key in player.inventory){
                     items.push(player.inventory[key].name + " " + player.inventory[key].amount);
                 }
