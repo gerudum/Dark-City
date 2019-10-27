@@ -26,7 +26,7 @@ function SaveData(data){
 //Save the newly created items
 function SaveItem(items){
     if(Validate(items)){
-        fs.writeFile('.data/dataTable.json', JSON.stringify(items,null,2), (err) =>{
+        fs.writeFile('.data/items.json', JSON.stringify(items,null,2), (err) =>{
             if (err) console.error(err);
         })
     } 
