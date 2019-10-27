@@ -148,9 +148,9 @@ bot.on('message', message=> {
                 //Put the item in
                 itemTable[itemName] = {};
                 itemTable[itemName].name = itemName;
-                itemTable[itemUsage].usage = itemUsage;
+                itemTable[itemName].usage = itemUsage;
 
-                message.reply("Item Created" + " " + itemTable[itemName].name + " " + itemTable[itemUsage].usage);
+                message.reply("Item Created" + " " + itemTable[itemName].name + " " + itemTable[itemName].usage);
             break;
 
             case 'createtable':
@@ -276,8 +276,8 @@ bot.on('message', message=> {
 
             case 'additem':
                 if(!message.member.roles.has(admin)){ return; }
-                if(!args[3]) { message.reply("Syntax: [playername] [itemname] [amount]"); return;}
-                if(!itemTable[args[2]]) { message.reply("Item does not exist, create a new item with /creatitem!"); return; }
+                if(!args[3]) { message.reply("Syntax: [playername] [itemname] [amount] " + args.length); return;}
+                if(!itemTable[args[2]]) { message.reply("Item does not exist, create a new item with /createitem!"); return; }
 
                 try {     
 
@@ -297,9 +297,10 @@ bot.on('message', message=> {
                     var amount = parseFloat(args[3].toString());
     
                     person.AddItem(args[2],parseFloat(args[3]));
-                    message.reply(amount + " boxes Added to " + person.name);
+                    message.reply(amount + " " + args[2]+"s added to" + person.name);
                 } catch(e) {
 
+                    console.log(e);
                     message.reply("Syntax: [playername] [itemname] [amount]");
                 }
             break;

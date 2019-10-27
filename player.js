@@ -25,7 +25,12 @@ class Player {
     }
 
     AddItem(item, amount){
-        this.inventory[item].amount += amount;
+        if(!this.inventory[item]){
+            this.inventory[item].name = item;
+            this.inventory[item].amount = 1;
+        } else {
+            this.inventory[item].amount += amount;
+        }
     }
 
     RemoveItem(item, amount){
