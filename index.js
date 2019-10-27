@@ -149,12 +149,14 @@ bot.on('message', message=> {
                 itemTable[itemName] = {};
                 itemTable[itemName].name = itemName;
                 itemTable[itemUsage].usage = itemUsage;
+
+                message.reply("Item Created", itemTable[itemName].name, itemTable[itemUsage].usage);
             break;
 
             case 'createtable':
                 if(!message.member.roles.has(admin)) { return; }
-                if(!args[3]) { return; }
-                //Alpha
+                if(!args[4]) { message.reply("Syntax: [tablename], [item], [item weight], [item], [item weight...] etc "); return; }
+                //tablename, item, item weight, item, item weight... etc
                 //Create New Table
                 var newTable = {};
 
@@ -172,8 +174,11 @@ bot.on('message', message=> {
                     var weight = parseFloat(args[i+1]);
 
                     //Set them in the table
+                    newTable[result] = {};
                     newTable[result].result = result;
                     newTable[result].weight = weight;
+
+                    console.log(newTable[result].result + " " + newTable[result].weight);
                 }
 
                 //Save the table
@@ -269,17 +274,13 @@ bot.on('message', message=> {
                 message.channel.send(unboxing);
             break;
 
-            case 'createitem':
-                if(!message.member.roles.has(admin)){ return; }
-            break;
-
             case 'additem':
                 if(!message.member.roles.has(admin)){ return; }
                 if(!args[3]) { message.reply("Syntax: [playername] [itemname] [amount]"); return;}
-                if(!itemTable[args[2]]) { console.log("Item does not exist, create a new item with /creatitem!"); return; }
+                if(!itemTable[args[2]]) { message.reply("Item does not exist, create a new item with /creatitem!"); return; }
 
                 try {     
-                          
+
                     //args 1 = name
                     //args 2 = item
                     //args 3 = amount
